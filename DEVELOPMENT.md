@@ -57,7 +57,7 @@
 - ✅ Routes admin (/admin/*)
 - ✅ Middlewares de protection par rôle
 
-#### Vues Blade (32 vues principales)
+#### Vues Blade (35 vues principales)
 
 **Layouts:**
 - ✅ layouts/frontend.blade.php
@@ -83,6 +83,9 @@
 - ✅ supplier/products/edit.blade.php
 - ✅ supplier/orders/index.blade.php
 - ✅ supplier/orders/show.blade.php
+- ✅ supplier/shipments/index.blade.php
+- ✅ supplier/commissions.blade.php
+- ✅ supplier/statistics.blade.php
 
 **Admin:**
 - ✅ admin/dashboard.blade.php
@@ -128,6 +131,8 @@
 10. **4811549** - Vues complètes d'administration (fournisseurs, catégories, produits, commandes, commissions)
 11. **a4d588c** - Mise à jour DEVELOPMENT.md avec vues admin complétées
 12. **de0653c** - Vues détaillées admin (products/show, orders/show, categories/edit)
+13. **13e3e15** - Mise à jour DEVELOPMENT.md avec vues détaillées admin
+14. **2eb129a** - Vues complètes gestion fournisseur (shipments, commissions, statistics)
 
 ## 🚧 À Compléter
 
@@ -149,9 +154,9 @@
 - [ ] supplier/products/import.blade.php - Import CSV
 - [x] supplier/orders/index.blade.php - Liste commandes
 - [x] supplier/orders/show.blade.php - Détails commande
-- [ ] supplier/shipments/index.blade.php - Liste expéditions
-- [ ] supplier/commissions.blade.php - Suivi commissions
-- [ ] supplier/statistics.blade.php - Statistiques détaillées
+- [x] supplier/shipments/index.blade.php - Liste expéditions
+- [x] supplier/commissions.blade.php - Suivi commissions
+- [x] supplier/statistics.blade.php - Statistiques détaillées
 
 #### Admin
 - [x] admin/suppliers/index.blade.php - Liste fournisseurs
