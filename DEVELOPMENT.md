@@ -57,7 +57,7 @@
 - ✅ Routes admin (/admin/*)
 - ✅ Middlewares de protection par rôle
 
-#### Vues Blade (35 vues principales)
+#### Vues Blade (38 vues principales)
 
 **Layouts:**
 - ✅ layouts/frontend.blade.php
@@ -69,12 +69,15 @@
 - ✅ home.blade.php
 - ✅ products/index.blade.php
 - ✅ products/show.blade.php
+- ✅ products/category.blade.php
+- ✅ products/search.blade.php
 - ✅ cart/index.blade.php
 - ✅ account/pending.blade.php
 - ✅ orders/index.blade.php
 - ✅ orders/show.blade.php
 - ✅ orders/checkout.blade.php
 - ✅ orders/confirmation.blade.php
+- ✅ profile/addresses.blade.php
 
 **Supplier:**
 - ✅ supplier/dashboard.blade.php
@@ -133,6 +136,9 @@
 12. **de0653c** - Vues détaillées admin (products/show, orders/show, categories/edit)
 13. **13e3e15** - Mise à jour DEVELOPMENT.md avec vues détaillées admin
 14. **2eb129a** - Vues complètes gestion fournisseur (shipments, commissions, statistics)
+15. **7cc97e2** - Mise à jour DEVELOPMENT.md avec vues fournisseur complétées
+16. **9ffef0c** - Feuille de route fonctionnalités avancées (FEATURES_ROADMAP.md)
+17. **598fd48** - Vues frontend essentielles (category, search, addresses)
 
 ## 🚧 À Compléter
 
@@ -143,9 +149,9 @@
 - [x] orders/show.blade.php - Détails commande
 - [x] orders/checkout.blade.php - Page de paiement
 - [x] orders/confirmation.blade.php - Confirmation commande
-- [ ] products/category.blade.php - Produits par catégorie
-- [ ] products/search.blade.php - Résultats de recherche
-- [ ] profile/addresses.blade.php - Gestion adresses
+- [x] products/category.blade.php - Produits par catégorie
+- [x] products/search.blade.php - Résultats de recherche
+- [x] profile/addresses.blade.php - Gestion adresses
 
 #### Fournisseur
 - [x] supplier/products/index.blade.php - Liste produits
