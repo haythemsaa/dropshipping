@@ -57,7 +57,7 @@
 - ✅ Routes admin (/admin/*)
 - ✅ Middlewares de protection par rôle
 
-#### Vues Blade (23 vues principales)
+#### Vues Blade (29 vues principales)
 
 **Layouts:**
 - ✅ layouts/frontend.blade.php
@@ -86,6 +86,12 @@
 
 **Admin:**
 - ✅ admin/dashboard.blade.php
+- ✅ admin/suppliers/index.blade.php
+- ✅ admin/suppliers/show.blade.php
+- ✅ admin/categories/index.blade.php
+- ✅ admin/products/index.blade.php
+- ✅ admin/orders/index.blade.php
+- ✅ admin/commissions/index.blade.php
 
 **Auth (Breeze):**
 - ✅ login, register, forgot-password, reset-password
@@ -115,6 +121,8 @@
 6. **ecb32c3** - Dashboards fournisseur et admin
 7. **e647f69** - Vues complètes du workflow de commande (checkout, confirmation, liste, détails)
 8. **399529b** - Vues complètes de gestion fournisseur (produits, commandes)
+9. **b3be9fc** - Mise à jour DEVELOPMENT.md avec progress
+10. **4811549** - Vues complètes d'administration (fournisseurs, catégories, produits, commandes, commissions)
 
 ## 🚧 À Compléter
 
@@ -141,16 +149,16 @@
 - [ ] supplier/statistics.blade.php - Statistiques détaillées
 
 #### Admin
-- [ ] admin/suppliers/index.blade.php - Liste fournisseurs
-- [ ] admin/suppliers/show.blade.php - Détails fournisseur
-- [ ] admin/categories/index.blade.php - Gestion catégories
-- [ ] admin/categories/create.blade.php - Créer catégorie
+- [x] admin/suppliers/index.blade.php - Liste fournisseurs
+- [x] admin/suppliers/show.blade.php - Détails fournisseur
+- [x] admin/categories/index.blade.php - Gestion catégories
+- [ ] admin/categories/create.blade.php - Créer catégorie (intégré dans index)
 - [ ] admin/categories/edit.blade.php - Éditer catégorie
-- [ ] admin/products/index.blade.php - Modération produits
+- [x] admin/products/index.blade.php - Modération produits
 - [ ] admin/products/show.blade.php - Détails produit
-- [ ] admin/orders/index.blade.php - Toutes les commandes
+- [x] admin/orders/index.blade.php - Toutes les commandes
 - [ ] admin/orders/show.blade.php - Détails commande
-- [ ] admin/commissions/index.blade.php - Gestion commissions
+- [x] admin/commissions/index.blade.php - Gestion commissions
 - [ ] admin/commissions/supplier.blade.php - Commissions par fournisseur
 - [ ] admin/commissions/report.blade.php - Rapport commissions
 - [ ] admin/statistics.blade.php - Statistiques globales
@@ -334,12 +342,12 @@ php artisan view:cache
 
 ## 🚀 Prochaines Étapes Recommandées
 
-1. **Créer les vues admin manquantes** (gestion fournisseurs, catégories, produits, commandes, commissions)
-2. **Créer les vues frontend restantes** (recherche, catégorie, gestion adresses)
-3. **Implémenter l'upload d'images** (pour les produits, actuellement placeholder)
-4. **Implémenter les notifications** (email d'abord, puis SMS)
-5. **Intégrer les paiements** (passerelles cartes bancaires et e-Dinar)
-6. **Tests unitaires** (pour sécuriser le code)
+1. **Créer les vues manquantes secondaires** (admin/orders/show, admin/products/show, recherche produits)
+2. **Implémenter l'upload d'images** (pour les produits, formulaires déjà prêts)
+3. **Implémenter les notifications** (email d'abord, puis SMS)
+4. **Intégrer les paiements** (passerelles cartes bancaires et e-Dinar)
+5. **Créer les vues de gestion des expéditions** (supplier/shipments)
+6. **Tests unitaires et fonctionnels** (pour sécuriser le code)
 7. **Déploiement staging** (pour tests en conditions réelles)
 
 ## 📞 Support
