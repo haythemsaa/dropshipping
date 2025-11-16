@@ -57,7 +57,7 @@
 - ✅ Routes admin (/admin/*)
 - ✅ Middlewares de protection par rôle
 
-#### Vues Blade (38 vues principales)
+#### Vues Blade (41 vues principales)
 
 **Layouts:**
 - ✅ layouts/frontend.blade.php
@@ -101,6 +101,9 @@
 - ✅ admin/orders/index.blade.php
 - ✅ admin/orders/show.blade.php
 - ✅ admin/commissions/index.blade.php
+- ✅ admin/commissions/supplier.blade.php
+- ✅ admin/commissions/report.blade.php
+- ✅ admin/statistics.blade.php
 
 **Auth (Breeze):**
 - ✅ login, register, forgot-password, reset-password
@@ -139,6 +142,8 @@
 15. **7cc97e2** - Mise à jour DEVELOPMENT.md avec vues fournisseur complétées
 16. **9ffef0c** - Feuille de route fonctionnalités avancées (FEATURES_ROADMAP.md)
 17. **598fd48** - Vues frontend essentielles (category, search, addresses)
+18. **1ca554b** - Mise à jour DEVELOPMENT.md avec vues frontend complétées
+19. **3d57833** - Vues finales admin (statistics, commissions/supplier, commissions/report)
 
 ## 🚧 À Compléter
 
@@ -175,9 +180,9 @@
 - [x] admin/orders/index.blade.php - Toutes les commandes
 - [x] admin/orders/show.blade.php - Détails commande
 - [x] admin/commissions/index.blade.php - Gestion commissions
-- [ ] admin/commissions/supplier.blade.php - Commissions par fournisseur
-- [ ] admin/commissions/report.blade.php - Rapport commissions
-- [ ] admin/statistics.blade.php - Statistiques globales
+- [x] admin/commissions/supplier.blade.php - Commissions par fournisseur
+- [x] admin/commissions/report.blade.php - Rapport commissions
+- [x] admin/statistics.blade.php - Statistiques globales
 
 ### Fonctionnalités Backend
 
