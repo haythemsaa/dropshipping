@@ -150,6 +150,7 @@
 23. **93f5f9e** - Système complet de notifications email (8 notifications, intégrations contrôleurs)
 24. **9f2a5b5** - Système complet d'intégration de paiements tunisiens (e-Dinar, Clictopay, Konnect)
 25. **757871b** - Système complet d'import CSV/Excel de produits (Laravel Excel, validation, template)
+26. **En attente** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
 
 ## 🚧 À Compléter
 
@@ -168,7 +169,7 @@
 - [x] supplier/products/index.blade.php - Liste produits
 - [x] supplier/products/create.blade.php - Créer produit
 - [x] supplier/products/edit.blade.php - Éditer produit
-- [ ] supplier/products/import.blade.php - Import CSV
+- [x] supplier/products/import.blade.php - Import CSV
 - [x] supplier/orders/index.blade.php - Liste commandes
 - [x] supplier/orders/show.blade.php - Détails commande
 - [x] supplier/shipments/index.blade.php - Liste expéditions
@@ -236,8 +237,13 @@
 - [x] Gestion des erreurs avec rapport détaillé
 - [x] Traitement par lots (batch/chunk)
 - [x] Vue d'import complète avec instructions
-- [ ] Export commandes
-- [ ] Export rapports
+- [x] Export commandes (fournisseur & admin)
+- [x] Export produits (fournisseur)
+- [x] Export commissions (admin)
+- [x] Export avec filtres (statut, dates, catégories)
+- [x] En-têtes stylisés par couleur (bleu/vert/orange/violet)
+- [x] Colonnes auto-ajustées
+- [x] Documentation complète d'export (EXPORT_GUIDE.md)
 
 ### Tests (Priorité Moyenne)
 

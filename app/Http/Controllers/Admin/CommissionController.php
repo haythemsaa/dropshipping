@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Commission;
 use App\Models\User;
+use App\Exports\CommissionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -150,5 +152,18 @@ class CommissionController extends Controller
             'startDate',
             'endDate'
         ));
+    }
+
+    /**
+     * Export des commissions en Excel
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only(['supplier_id', 'status', 'date_from', 'date_to']);
+
+        return Excel::download(
+            new CommissionsExport($filters),
+            'commissions_' . date('Y-m-d') . '.xlsx'
+        );
     }
 }

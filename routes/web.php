@@ -100,11 +100,17 @@ Route::middleware(['auth', 'verified', 'active', 'supplier'])->prefix('fournisse
     Route::post('/produits/import', [SupplierProductController::class, 'import'])->name('products.import.process');
     Route::get('/produits/template', [SupplierProductController::class, 'downloadTemplate'])->name('products.template');
 
+    // Export de produits
+    Route::get('/produits/export', [SupplierProductController::class, 'export'])->name('products.export');
+
     // Gestion des commandes
     Route::get('/commandes', [SupplierOrderController::class, 'index'])->name('orders.index');
     Route::get('/commandes/{order}', [SupplierOrderController::class, 'show'])->name('orders.show');
     Route::post('/commandes/{orderItem}/accepter', [SupplierOrderController::class, 'accept'])->name('orders.accept');
     Route::post('/commandes/{orderItem}/refuser', [SupplierOrderController::class, 'reject'])->name('orders.reject');
+
+    // Export de commandes
+    Route::get('/commandes/export', [SupplierOrderController::class, 'export'])->name('orders.export');
 
     // Gestion des expéditions
     Route::get('/expeditions', [SupplierShipmentController::class, 'index'])->name('shipments.index');
@@ -158,12 +164,14 @@ Route::middleware(['auth', 'verified', 'active', 'admin'])->prefix('admin')->nam
     Route::get('/commandes/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::post('/commandes/{order}/annuler', [AdminOrderController::class, 'cancel'])->name('orders.cancel');
     Route::patch('/commandes/{order}/statut', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::get('/commandes/export', [AdminOrderController::class, 'export'])->name('orders.export');
 
     // Gestion des commissions
     Route::get('/commissions', [AdminCommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/fournisseur/{user}', [AdminCommissionController::class, 'supplier'])->name('commissions.supplier');
     Route::post('/commissions/{commission}/payer', [AdminCommissionController::class, 'markAsPaid'])->name('commissions.mark-paid');
     Route::get('/commissions/rapport', [AdminCommissionController::class, 'report'])->name('commissions.report');
+    Route::get('/commissions/export', [AdminCommissionController::class, 'export'])->name('commissions.export');
 });
 
 /*

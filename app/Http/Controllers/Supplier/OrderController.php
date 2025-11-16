@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Supplier;
 use App\Http\Controllers\Controller;
 use App\Models\OrderItem;
 use App\Models\Order;
+use App\Exports\SupplierOrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -133,5 +135,18 @@ class OrderController extends Controller
             DB::rollBack();
             return back()->with('error', 'Une erreur est survenue.');
         }
+    }
+
+    /**
+     * Export des commandes en Excel
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only(['status', 'date_from', 'date_to']);
+
+        return Excel::download(
+            new SupplierOrdersExport(auth()->id(), $filters),
+            'commandes_' . date('Y-m-d') . '.xlsx'
+        );
     }
 }

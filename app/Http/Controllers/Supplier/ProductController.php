@@ -8,6 +8,7 @@ use App\Models\ProductImage;
 use App\Models\Category;
 use App\Imports\ProductsImport;
 use App\Exports\ProductsTemplateExport;
+use App\Exports\SupplierProductsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -393,5 +394,18 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Export des produits en Excel
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only(['status', 'category_id']);
+
+        return Excel::download(
+            new SupplierProductsExport(auth()->id(), $filters),
+            'produits_' . date('Y-m-d') . '.xlsx'
+        );
     }
 }

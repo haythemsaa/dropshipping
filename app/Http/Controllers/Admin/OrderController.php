@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Exports\AdminOrdersExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -134,5 +136,18 @@ class OrderController extends Controller
             DB::rollBack();
             return back()->with('error', 'Une erreur est survenue lors de la mise à jour.');
         }
+    }
+
+    /**
+     * Export des commandes en Excel
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only(['status', 'payment_method', 'date_from', 'date_to']);
+
+        return Excel::download(
+            new AdminOrdersExport($filters),
+            'commandes_' . date('Y-m-d') . '.xlsx'
+        );
     }
 }
