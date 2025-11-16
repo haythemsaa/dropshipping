@@ -67,6 +67,73 @@ class Product extends Model
         return $this->hasMany(CartItem::class);
     }
 
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
+    public function approvedReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+    }
+
+    /**
+     * Calculer la note moyenne du produit
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        return round($this->approvedReviews()->avg('rating') ?? 0, 1);
+    }
+
+    /**
+     * Compter les avis approuvés
+     */
+    public function getReviewsCountAttribute(): int
+    {
+        return $this->approvedReviews()->count();
+    }
+
+    /**
+     * Obtenir la distribution des notes (1-5 étoiles)
+     */
+    public function getRatingDistribution(): array
+    {
+        $distribution = [];
+        $total = $this->reviewsCount;
+
+        for ($i = 5; $i >= 1; $i--) {
+            $count = $this->approvedReviews()->where('rating', $i)->count();
+            $distribution[$i] = [
+                'count' => $count,
+                'percentage' => $total > 0 ? round(($count / $total) * 100) : 0,
+            ];
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Vérifier si un utilisateur peut laisser un avis
+     */
+    public function canBeReviewedBy(User $user): bool
+    {
+        // Vérifier que l'utilisateur a acheté et reçu ce produit
+        return $this->orderItems()
+            ->whereHas('order', function ($query) use ($user) {
+                $query->where('user_id', $user->id)
+                    ->where('status', 'delivered');
+            })
+            ->exists();
+    }
+
+    /**
+     * Vérifier si un utilisateur a déjà laissé un avis
+     */
+    public function hasReviewFrom(User $user): bool
+    {
+        return $this->reviews()->where('user_id', $user->id)->exists();
+    }
+
     public function isInStock(): bool
     {
         return $this->stock_quantity > 0;

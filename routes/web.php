@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PaymentWebhookController;
 
 /*
@@ -68,7 +70,17 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
         Route::post('/checkout', [OrderController::class, 'store'])->name('orders.store');
         Route::get('/commande/{order}/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
         Route::post('/commande/{order}/annuler', [OrderController::class, 'cancel'])->name('orders.cancel');
+
+        // Avis produits (clients seulement)
+        Route::get('/produit/{product}/avis/creer', [ReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/produit/{product}/avis', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::get('/avis/{review}/modifier', [ReviewController::class, 'edit'])->name('reviews.edit');
+        Route::patch('/avis/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+        Route::delete('/avis/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
+
+    // Marquer un avis comme utile (tous les utilisateurs authentifiés)
+    Route::post('/avis/{review}/utile', [ReviewController::class, 'markHelpful'])->name('reviews.helpful');
 });
 
 /*
@@ -172,6 +184,14 @@ Route::middleware(['auth', 'verified', 'active', 'admin'])->prefix('admin')->nam
     Route::post('/commissions/{commission}/payer', [AdminCommissionController::class, 'markAsPaid'])->name('commissions.mark-paid');
     Route::get('/commissions/rapport', [AdminCommissionController::class, 'report'])->name('commissions.report');
     Route::get('/commissions/export', [AdminCommissionController::class, 'export'])->name('commissions.export');
+
+    // Modération des avis
+    Route::get('/avis', [AdminReviewController::class, 'index'])->name('reviews.index');
+    Route::post('/avis/{review}/approuver', [AdminReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('/avis/{review}/rejeter', [AdminReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('/avis/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/avis/approuver-masse', [AdminReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
+    Route::post('/avis/supprimer-masse', [AdminReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
 });
 
 /*

@@ -150,7 +150,8 @@
 23. **93f5f9e** - Système complet de notifications email (8 notifications, intégrations contrôleurs)
 24. **9f2a5b5** - Système complet d'intégration de paiements tunisiens (e-Dinar, Clictopay, Konnect)
 25. **757871b** - Système complet d'import CSV/Excel de produits (Laravel Excel, validation, template)
-26. **En attente** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
+26. **10aa745** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
+27. **En attente** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
 
 ## 🚧 À Compléter
 
@@ -244,6 +245,23 @@
 - [x] En-têtes stylisés par couleur (bleu/vert/orange/violet)
 - [x] Colonnes auto-ajustées
 - [x] Documentation complète d'export (EXPORT_GUIDE.md)
+
+#### Avis & Évaluations Produits
+- [x] Migration product_reviews (notes 1-5, commentaires, modération)
+- [x] Modèle ProductReview (relations, scopes, méthodes helper)
+- [x] Méthodes de calcul de notes dans Product model
+- [x] Distribution des notes (pourcentages 1-5 étoiles)
+- [x] Vérification d'achat avant avis
+- [x] ReviewController pour clients (create, store, edit, update, destroy)
+- [x] Admin ReviewController pour modération (approve, reject, bulk actions)
+- [x] Routes d'avis (clients + admin)
+- [x] Système de votes "utile" pour avis
+- [x] Modification d'avis limitée à 48h
+- [ ] Vue création d'avis
+- [ ] Vue modération admin
+- [ ] Affichage avis sur page produit
+- [ ] Notification fournisseur nouvel avis
+- [ ] Notification client avis approuvé
 
 ### Tests (Priorité Moyenne)
 
