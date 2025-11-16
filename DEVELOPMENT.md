@@ -57,7 +57,7 @@
 - ✅ Routes admin (/admin/*)
 - ✅ Middlewares de protection par rôle
 
-#### Vues Blade (29 vues principales)
+#### Vues Blade (32 vues principales)
 
 **Layouts:**
 - ✅ layouts/frontend.blade.php
@@ -89,8 +89,11 @@
 - ✅ admin/suppliers/index.blade.php
 - ✅ admin/suppliers/show.blade.php
 - ✅ admin/categories/index.blade.php
+- ✅ admin/categories/edit.blade.php
 - ✅ admin/products/index.blade.php
+- ✅ admin/products/show.blade.php
 - ✅ admin/orders/index.blade.php
+- ✅ admin/orders/show.blade.php
 - ✅ admin/commissions/index.blade.php
 
 **Auth (Breeze):**
@@ -123,6 +126,8 @@
 8. **399529b** - Vues complètes de gestion fournisseur (produits, commandes)
 9. **b3be9fc** - Mise à jour DEVELOPMENT.md avec progress
 10. **4811549** - Vues complètes d'administration (fournisseurs, catégories, produits, commandes, commissions)
+11. **a4d588c** - Mise à jour DEVELOPMENT.md avec vues admin complétées
+12. **de0653c** - Vues détaillées admin (products/show, orders/show, categories/edit)
 
 ## 🚧 À Compléter
 
@@ -152,12 +157,12 @@
 - [x] admin/suppliers/index.blade.php - Liste fournisseurs
 - [x] admin/suppliers/show.blade.php - Détails fournisseur
 - [x] admin/categories/index.blade.php - Gestion catégories
-- [ ] admin/categories/create.blade.php - Créer catégorie (intégré dans index)
-- [ ] admin/categories/edit.blade.php - Éditer catégorie
+- [x] admin/categories/create.blade.php - Créer catégorie (intégré dans index)
+- [x] admin/categories/edit.blade.php - Éditer catégorie
 - [x] admin/products/index.blade.php - Modération produits
-- [ ] admin/products/show.blade.php - Détails produit
+- [x] admin/products/show.blade.php - Détails produit
 - [x] admin/orders/index.blade.php - Toutes les commandes
-- [ ] admin/orders/show.blade.php - Détails commande
+- [x] admin/orders/show.blade.php - Détails commande
 - [x] admin/commissions/index.blade.php - Gestion commissions
 - [ ] admin/commissions/supplier.blade.php - Commissions par fournisseur
 - [ ] admin/commissions/report.blade.php - Rapport commissions
