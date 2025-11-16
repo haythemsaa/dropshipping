@@ -146,6 +146,8 @@
 19. **3d57833** - Vues finales admin (statistics, commissions/supplier, commissions/report)
 20. **8eb4cf5** - Mise à jour DEVELOPMENT.md - Toutes les 41 vues complétées!
 21. **9473fd6** - Service professionnel d'upload d'images avec optimisation (GD, thumbnails, validation)
+22. **5e0ef71** - Mise à jour DEVELOPMENT.md - Service d'upload d'images complété
+23. **93f5f9e** - Système complet de notifications email (8 notifications, intégrations contrôleurs)
 
 ## 🚧 À Compléter
 
@@ -206,11 +208,18 @@
   - [ ] Livraison
 
 #### Paiements (Priorité Haute)
-- [ ] Intégration passerelle cartes bancaires tunisiennes
-- [ ] Intégration e-Dinar (D17 Poste Tunisienne)
-- [ ] Gestion paiement à la livraison (COD)
-- [ ] Webhook pour confirmations paiement
-- [ ] Gestion des remboursements
+- [x] Architecture de service de paiement abstrait
+- [x] Interface PaymentGatewayInterface
+- [x] Intégration e-Dinar (D17 Poste Tunisienne)
+- [x] Intégration Clictopay/SMT (cartes bancaires)
+- [x] Intégration Konnect (wallet mobile)
+- [x] Gestion paiement à la livraison (COD)
+- [x] Webhooks pour confirmations paiement
+- [x] Vérification de signatures sécurisées
+- [x] Gestion des remboursements (API prête)
+- [x] Migration DB avec champs gateway
+- [ ] Configuration credentials production
+- [ ] Tests avec vrais comptes marchands
 
 #### Uploads & Médias
 - [x] Upload et redimensionnement d'images produits

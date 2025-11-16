@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
+use App\Http\Controllers\PaymentWebhookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -178,5 +179,30 @@ Route::middleware(['auth'])->group(function () {
         return view('account.pending');
     })->name('account.pending');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Payment Webhooks (Sans Auth)
+|--------------------------------------------------------------------------
+*/
+
+// Webhooks des passerelles de paiement
+Route::post('/payment/webhook/edinar', [PaymentWebhookController::class, 'edinarWebhook'])
+    ->name('payment.callback.edinar.notify');
+Route::post('/payment/webhook/clictopay', [PaymentWebhookController::class, 'clictopayWebhook'])
+    ->name('payment.callback.clictopay.webhook');
+Route::post('/payment/webhook/konnect', [PaymentWebhookController::class, 'konnectWebhook'])
+    ->name('payment.callback.konnect.webhook');
+
+// Pages de retour après paiement
+Route::get('/payment/return/{gateway}', [PaymentWebhookController::class, 'paymentReturn'])
+    ->name('payment.callback.edinar.return')
+    ->name('payment.callback.clictopay.return')
+    ->name('payment.callback.konnect.success');
+
+Route::get('/payment/cancel/{gateway}', [PaymentWebhookController::class, 'paymentCancel'])
+    ->name('payment.callback.edinar.cancel')
+    ->name('payment.callback.clictopay.cancel')
+    ->name('payment.callback.konnect.fail');
 
 require __DIR__.'/auth.php';
