@@ -144,6 +144,8 @@
 17. **598fd48** - Vues frontend essentielles (category, search, addresses)
 18. **1ca554b** - Mise à jour DEVELOPMENT.md avec vues frontend complétées
 19. **3d57833** - Vues finales admin (statistics, commissions/supplier, commissions/report)
+20. **8eb4cf5** - Mise à jour DEVELOPMENT.md - Toutes les 41 vues complétées!
+21. **9473fd6** - Service professionnel d'upload d'images avec optimisation (GD, thumbnails, validation)
 
 ## 🚧 À Compléter
 
@@ -209,10 +211,10 @@
 - [ ] Gestion des remboursements
 
 #### Uploads & Médias
-- [ ] Upload et redimensionnement d'images produits
-- [ ] Optimisation des images (WebP, compression)
-- [ ] Validation formats et tailles
-- [ ] Gestion du stockage (storage/app/public)
+- [x] Upload et redimensionnement d'images produits
+- [x] Optimisation des images (WebP, compression)
+- [x] Validation formats et tailles
+- [x] Gestion du stockage (storage/app/public)
 
 #### Import/Export
 - [ ] Import produits CSV/Excel
