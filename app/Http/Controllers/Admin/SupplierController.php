@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\SupplierApproved;
+use App\Notifications\SupplierSuspended;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -99,9 +101,10 @@ class SupplierController extends Controller
                 'approved_by' => auth()->id(),
             ]);
 
-            // TODO: Envoyer email de confirmation au fournisseur
-
             DB::commit();
+
+            // Envoyer email de confirmation au fournisseur
+            $user->notify(new SupplierApproved());
 
             return redirect()->route('admin.suppliers.show', $user)
                 ->with('success', 'Fournisseur approuvé avec succès.');
@@ -158,9 +161,10 @@ class SupplierController extends Controller
             // Désactiver tous les produits du fournisseur
             $user->products()->update(['status' => 'inactive']);
 
-            // TODO: Envoyer email de notification au fournisseur
-
             DB::commit();
+
+            // Envoyer email de notification au fournisseur
+            $user->notify(new SupplierSuspended('Suspension administrative'));
 
             return back()->with('success', 'Fournisseur suspendu. Tous ses produits ont été désactivés.');
         } catch (\Exception $e) {
@@ -185,9 +189,10 @@ class SupplierController extends Controller
                 'status' => 'active',
             ]);
 
-            // TODO: Envoyer email de notification au fournisseur
-
             DB::commit();
+
+            // Envoyer email de notification au fournisseur
+            $user->notify(new SupplierApproved());
 
             return back()->with('success', 'Fournisseur réactivé. Les produits restent désactivés et devront être réactivés manuellement.');
         } catch (\Exception $e) {

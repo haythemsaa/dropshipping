@@ -8,6 +8,9 @@ use App\Models\Cart;
 use App\Models\Address;
 use App\Models\Payment;
 use App\Models\Commission;
+use App\Notifications\OrderConfirmation;
+use App\Notifications\NewOrderNotification;
+use App\Notifications\OrderStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -208,7 +211,18 @@ class OrderController extends Controller
 
             DB::commit();
 
-            // TODO: Envoyer les notifications par email et SMS
+            // Envoyer la notification de confirmation au client
+            auth()->user()->notify(new OrderConfirmation($order));
+
+            // Envoyer la notification aux fournisseurs concernés
+            $suppliers = $order->items()->with('supplier')->get()
+                ->pluck('supplier')
+                ->unique('id');
+
+            foreach ($suppliers as $supplier) {
+                $supplier->notify(new NewOrderNotification($order));
+            }
+
             // TODO: Si paiement par carte ou e-Dinar, rediriger vers la passerelle
 
             return redirect()->route('orders.confirmation', $order)
@@ -257,6 +271,8 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
+            $oldStatus = $order->status;
+
             // Mettre à jour le statut
             $order->update(['status' => 'cancelled']);
 
@@ -277,6 +293,9 @@ class OrderController extends Controller
             }
 
             DB::commit();
+
+            // Notifier le client de l'annulation
+            auth()->user()->notify(new OrderStatusUpdated($order, $oldStatus));
 
             return redirect()->route('orders.show', $order)
                 ->with('success', 'Commande annulée avec succès.');

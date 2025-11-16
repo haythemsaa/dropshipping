@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Notifications\ProductApproved;
+use App\Notifications\ProductRejected;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -78,9 +80,10 @@ class ProductController extends Controller
                 'status' => 'active',
             ]);
 
-            // TODO: Notifier le fournisseur
-
             DB::commit();
+
+            // Notifier le fournisseur
+            $product->supplier->notify(new ProductApproved($product));
 
             return back()->with('success', 'Produit approuvé et activé avec succès.');
         } catch (\Exception $e) {
@@ -104,9 +107,10 @@ class ProductController extends Controller
                 'status' => 'inactive',
             ]);
 
-            // TODO: Notifier le fournisseur avec raison du rejet
-
             DB::commit();
+
+            // Notifier le fournisseur avec raison du rejet
+            $product->supplier->notify(new ProductRejected($product, 'Le produit ne respecte pas nos critères de qualité'));
 
             return back()->with('success', 'Produit rejeté.');
         } catch (\Exception $e) {

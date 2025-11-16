@@ -189,14 +189,16 @@
 ### Fonctionnalités Backend
 
 #### Notifications (Priorité Haute)
-- [ ] Système de notifications email
-  - [ ] Confirmation d'inscription
-  - [ ] Nouvelle commande (client, fournisseur, admin)
-  - [ ] Expédition (client)
-  - [ ] Mise à jour tracking (client)
-  - [ ] Approbation fournisseur
-  - [ ] Approbation produit
-  - [ ] Suspension compte
+- [x] Système de notifications email
+  - [x] Confirmation de commande (client)
+  - [x] Nouvelle commande (fournisseur)
+  - [x] Mise à jour statut commande (client)
+  - [x] Expédition (client)
+  - [x] Mise à jour tracking (client)
+  - [x] Approbation fournisseur
+  - [x] Suspension fournisseur
+  - [x] Approbation produit
+  - [x] Rejet produit
 
 - [ ] Système de notifications SMS (API tunisienne)
   - [ ] Confirmation commande

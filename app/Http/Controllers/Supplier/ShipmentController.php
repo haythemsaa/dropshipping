@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Supplier;
 use App\Http\Controllers\Controller;
 use App\Models\Shipment;
 use App\Models\OrderItem;
+use App\Notifications\ShipmentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -78,9 +79,12 @@ class ShipmentController extends Controller
             // Mettre à jour le statut de l'item
             $orderItem->update(['status' => 'shipped']);
 
-            // TODO: Envoyer notification au client avec info de tracking
-
             DB::commit();
+
+            // Envoyer notification au client avec info de tracking
+            $shipment->load('orderItem.order');
+            $customer = $shipment->orderItem->order->user;
+            $customer->notify(new ShipmentNotification($shipment));
 
             return back()->with('success', 'Expédition créée avec succès.');
         } catch (\Exception $e) {
@@ -162,9 +166,12 @@ class ShipmentController extends Controller
                 'tracking_history' => json_encode($history)
             ]);
 
-            // TODO: Envoyer notification au client avec mise à jour
-
             DB::commit();
+
+            // Envoyer notification au client avec mise à jour
+            $shipment->load('orderItem.order');
+            $customer = $shipment->orderItem->order->user;
+            $customer->notify(new ShipmentNotification($shipment));
 
             return back()->with('success', 'Suivi mis à jour avec succès.');
         } catch (\Exception $e) {
