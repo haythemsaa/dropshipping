@@ -140,7 +140,43 @@ Plateforme web de dropshipping destinée au marché tunisien, permettant aux ven
 - Node.js & NPM (pour les assets frontend)
 - Serveur web (Apache/Nginx)
 
-### Installation
+### Installation Rapide (Recommandée)
+
+Un script d'installation automatique est fourni pour faciliter la mise en place du projet :
+
+```bash
+# Cloner le repository
+git clone <repository-url>
+cd dropshipping
+
+# Lancer le script d'installation
+chmod +x install.sh
+./install.sh
+```
+
+Le script va automatiquement :
+- ✅ Installer toutes les dépendances Composer
+- ✅ Créer le fichier `.env` à partir de `.env.example`
+- ✅ Générer la clé d'application Laravel
+- ✅ Exécuter les migrations de base de données
+- ✅ Remplir la base avec des données de test (seeders)
+- ✅ Créer le lien symbolique pour le stockage
+- ✅ Nettoyer tous les caches
+
+**Comptes de test créés automatiquement :**
+
+| Rôle | Email | Mot de passe | Détails |
+|------|-------|--------------|---------|
+| Administrateur | admin@dropshipping.tn | password | Accès complet |
+| Fournisseur | supplier1@example.tn | password | TechStore Tunisia (10%) |
+| Fournisseur | supplier2@example.tn | password | Mode Chic (12%) |
+| Fournisseur | supplier3@example.tn | password | Maison & Déco (15%) |
+| Fournisseur (pending) | pending@example.tn | password | En attente d'approbation |
+| Client | client1@example.tn | password | - |
+| Client | client2@example.tn | password | - |
+| Client | client3@example.tn | password | - |
+
+### Installation Manuelle
 
 1. **Cloner le repository**
 ```bash
