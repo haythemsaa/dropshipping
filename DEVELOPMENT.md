@@ -148,6 +148,8 @@
 21. **9473fd6** - Service professionnel d'upload d'images avec optimisation (GD, thumbnails, validation)
 22. **5e0ef71** - Mise à jour DEVELOPMENT.md - Service d'upload d'images complété
 23. **93f5f9e** - Système complet de notifications email (8 notifications, intégrations contrôleurs)
+24. **9f2a5b5** - Système complet d'intégration de paiements tunisiens (e-Dinar, Clictopay, Konnect)
+25. **757871b** - Système complet d'import CSV/Excel de produits (Laravel Excel, validation, template)
 
 ## 🚧 À Compléter
 
@@ -228,8 +230,12 @@
 - [x] Gestion du stockage (storage/app/public)
 
 #### Import/Export
-- [ ] Import produits CSV/Excel
-- [ ] Template CSV pour import
+- [x] Import produits CSV/Excel (Laravel Excel)
+- [x] Template CSV/Excel pour import avec exemples
+- [x] Validation automatique des données
+- [x] Gestion des erreurs avec rapport détaillé
+- [x] Traitement par lots (batch/chunk)
+- [x] Vue d'import complète avec instructions
 - [ ] Export commandes
 - [ ] Export rapports
 
