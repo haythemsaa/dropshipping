@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Category;
+use App\Imports\ProductsImport;
+use App\Exports\ProductsTemplateExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -322,11 +325,23 @@ class ProductController extends Controller
     }
 
     /**
-     * Affiche le formulaire d'import
+     * Affiche la page d'import de produits
      */
-    public function importForm()
+    public function showImport()
     {
-        return view('supplier.products.import');
+        $categories = Category::where('is_active', true)->get();
+        return view('supplier.products.import', compact('categories'));
+    }
+
+    /**
+     * Télécharge le template CSV
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(
+            new ProductsTemplateExport(),
+            'template_produits_' . date('Y-m-d') . '.xlsx'
+        );
     }
 
     /**
@@ -335,12 +350,48 @@ class ProductController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt,xlsx|max:5120',
+            'file' => 'required|file|mimes:csv,txt,xlsx,xls|max:10240',
         ]);
 
-        // TODO: Implémenter l'import CSV/Excel
-        // Utiliser Laravel Excel ou traitement manuel du CSV
+        try {
+            $import = new ProductsImport(auth()->id());
 
-        return back()->with('info', 'La fonctionnalité d\'import est en cours de développement.');
+            Excel::import($import, $request->file('file'));
+
+            $stats = $import->getStats();
+            $failures = $import->failures();
+
+            // Préparer le message de succès
+            $message = "Import terminé ! ";
+            $message .= "{$stats['imported']} produits importés avec succès.";
+
+            if ($stats['skipped'] > 0) {
+                $message .= " {$stats['skipped']} lignes ignorées (vides).";
+            }
+
+            if ($stats['failed'] > 0) {
+                $message .= " {$stats['failed']} produits ont échoué.";
+
+                // Stocker les erreurs dans la session pour les afficher
+                $errors = [];
+                foreach ($failures as $failure) {
+                    $errors[] = [
+                        'row' => $failure->row(),
+                        'errors' => $failure->errors(),
+                    ];
+                }
+
+                session()->flash('import_errors', $errors);
+
+                return redirect()->route('supplier.products.import')
+                    ->with('warning', $message);
+            }
+
+            return redirect()->route('supplier.products.index')
+                ->with('success', $message . ' Les produits sont en attente d\'approbation.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de l\'import : ' . $e->getMessage());
+        }
     }
 }

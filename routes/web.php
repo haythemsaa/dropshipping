@@ -96,8 +96,9 @@ Route::middleware(['auth', 'verified', 'active', 'supplier'])->prefix('fournisse
     Route::post('/produits/images/{image}/set-primary', [SupplierProductController::class, 'setPrimaryImage'])->name('products.images.set-primary');
 
     // Import de produits
-    Route::get('/produits/import', [SupplierProductController::class, 'importForm'])->name('products.import.form');
-    Route::post('/produits/import', [SupplierProductController::class, 'import'])->name('products.import');
+    Route::get('/produits/import', [SupplierProductController::class, 'showImport'])->name('products.import');
+    Route::post('/produits/import', [SupplierProductController::class, 'import'])->name('products.import.process');
+    Route::get('/produits/template', [SupplierProductController::class, 'downloadTemplate'])->name('products.template');
 
     // Gestion des commandes
     Route::get('/commandes', [SupplierOrderController::class, 'index'])->name('orders.index');
