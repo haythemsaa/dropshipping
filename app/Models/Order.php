@@ -16,6 +16,9 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'customer_id',
+        'coupon_id',
+        'coupon_code',
+        'coupon_discount',
         'status',
         'subtotal',
         'shipping_cost',
@@ -35,6 +38,7 @@ class Order extends Model
         'shipping_cost' => 'decimal:2',
         'tax' => 'decimal:2',
         'discount' => 'decimal:2',
+        'coupon_discount' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 
@@ -82,6 +86,16 @@ class Order extends Model
     public function commissions(): HasMany
     {
         return $this->hasMany(Commission::class);
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    public function couponUsage(): HasOne
+    {
+        return $this->hasOne(CouponUsage::class);
     }
 
     /**

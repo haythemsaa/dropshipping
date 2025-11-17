@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PaymentWebhookController;
@@ -199,6 +200,16 @@ Route::middleware(['auth', 'verified', 'active', 'admin'])->prefix('admin')->nam
     Route::delete('/avis/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::post('/avis/approuver-masse', [AdminReviewController::class, 'bulkApprove'])->name('reviews.bulk-approve');
     Route::post('/avis/supprimer-masse', [AdminReviewController::class, 'bulkDelete'])->name('reviews.bulk-delete');
+
+    // Gestion des coupons
+    Route::get('/coupons', [AdminCouponController::class, 'index'])->name('coupons.index');
+    Route::get('/coupons/creer', [AdminCouponController::class, 'create'])->name('coupons.create');
+    Route::post('/coupons', [AdminCouponController::class, 'store'])->name('coupons.store');
+    Route::get('/coupons/{coupon}', [AdminCouponController::class, 'show'])->name('coupons.show');
+    Route::get('/coupons/{coupon}/edit', [AdminCouponController::class, 'edit'])->name('coupons.edit');
+    Route::patch('/coupons/{coupon}', [AdminCouponController::class, 'update'])->name('coupons.update');
+    Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy'])->name('coupons.destroy');
+    Route::post('/coupons/{coupon}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
 });
 
 /*
