@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\ProductAttributeController as AdminProductAttribu
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ComparisonController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\Supplier\ProductVariantController as SupplierProductVariantController;
 
@@ -54,6 +55,10 @@ Route::post('/comparaison/ajouter', [ComparisonController::class, 'add'])->name(
 Route::delete('/comparaison/{product}', [ComparisonController::class, 'remove'])->name('comparison.remove');
 Route::delete('/comparaison', [ComparisonController::class, 'clear'])->name('comparison.clear');
 Route::get('/comparaison/count', [ComparisonController::class, 'count'])->name('comparison.count');
+
+// Newsletter
+Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
 
 /*
 |--------------------------------------------------------------------------

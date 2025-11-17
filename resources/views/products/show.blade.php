@@ -217,6 +217,17 @@
                 </div>
             </div>
 
+            <!-- Social Share Buttons -->
+            <div class="mb-6">
+                <x-social-share
+                    :url="route('products.show', $product->slug)"
+                    :title="$product->name"
+                    :description="Str::limit($product->description, 150)"
+                    :image="$product->images->first() ? Storage::url($product->images->first()->image_path) : ''"
+                    class="flex flex-wrap items-center gap-3"
+                />
+            </div>
+
             <!-- Add to Cart Form -->
             <div x-show="currentStock > 0">
                 <form action="{{ route('cart.add') }}" method="POST" class="mb-6">
