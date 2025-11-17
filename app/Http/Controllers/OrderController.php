@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\Address;
 use App\Models\Payment;
 use App\Models\Commission;
+use App\Models\Coupon;
 use App\Notifications\OrderConfirmation;
 use App\Notifications\NewOrderNotification;
 use App\Notifications\OrderStatusUpdated;
@@ -86,6 +87,69 @@ class OrderController extends Controller
     }
 
     /**
+     * Valide un code coupon (AJAX)
+     */
+    public function validateCoupon(Request $request)
+    {
+        $request->validate([
+            'coupon_code' => 'required|string',
+            'subtotal' => 'required|numeric|min:0',
+        ]);
+
+        $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+
+        if (!$coupon) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Ce code promo n\'existe pas.',
+            ]);
+        }
+
+        $error = $coupon->getValidationError(auth()->user(), $request->subtotal);
+        if ($error) {
+            return response()->json([
+                'valid' => false,
+                'message' => $error,
+            ]);
+        }
+
+        // Calculer le panier pour le coupon
+        $cart = Cart::where('user_id', auth()->id())->first();
+        if (!$cart) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Panier introuvable.',
+            ]);
+        }
+
+        $cart->load('items.product');
+        $cartItems = [];
+        foreach ($cart->items as $item) {
+            $cartItems[] = [
+                'product' => $item->product,
+                'quantity' => $item->quantity,
+            ];
+        }
+
+        $discount = $coupon->calculateDiscount($request->subtotal, $cartItems);
+
+        if ($discount == 0 && $coupon->type !== 'free_shipping') {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Ce coupon ne s\'applique pas aux produits de votre panier.',
+            ]);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'message' => 'Code promo appliqué avec succès!',
+            'discount' => $discount,
+            'type' => $coupon->type,
+            'formatted_discount' => number_format($discount, 2) . ' TND',
+        ]);
+    }
+
+    /**
      * Crée une nouvelle commande
      */
     public function store(Request $request)
@@ -95,6 +159,7 @@ class OrderController extends Controller
             'billing_address_id' => 'required|exists:addresses,id',
             'payment_method' => 'required|in:card,e-dinar,cod',
             'notes' => 'nullable|string|max:500',
+            'coupon_code' => 'nullable|string',
         ]);
 
         $cart = Cart::where('user_id', auth()->id())->first();
@@ -139,20 +204,67 @@ class OrderController extends Controller
                 $subtotal += $item->price * $item->quantity;
             }
 
-            $total = $subtotal + $shippingFee + $tax;
+            // Traiter le coupon si présent
+            $coupon = null;
+            $couponDiscount = 0;
+            $freeShipping = false;
+
+            if ($request->filled('coupon_code')) {
+                $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+
+                if ($coupon) {
+                    $error = $coupon->getValidationError(auth()->user(), $subtotal);
+                    if ($error) {
+                        DB::rollBack();
+                        return redirect()->route('orders.checkout')
+                            ->with('error', $error);
+                    }
+
+                    // Calculer la réduction
+                    $cartItems = [];
+                    foreach ($cart->items as $item) {
+                        $cartItems[] = [
+                            'product' => $item->product,
+                            'quantity' => $item->quantity,
+                        ];
+                    }
+
+                    $couponDiscount = $coupon->calculateDiscount($subtotal, $cartItems);
+
+                    if ($coupon->type === 'free_shipping') {
+                        $freeShipping = true;
+                    }
+
+                    if ($couponDiscount == 0 && !$freeShipping) {
+                        DB::rollBack();
+                        return redirect()->route('orders.checkout')
+                            ->with('error', 'Ce coupon ne s\'applique pas à votre panier.');
+                    }
+                }
+            }
+
+            // Appliquer la réduction
+            if ($freeShipping) {
+                $shippingFee = 0;
+            }
+
+            $total = $subtotal + $shippingFee + $tax - $couponDiscount;
 
             // Créer la commande
             $order = Order::create([
                 'order_number' => 'ORD-' . strtoupper(Str::random(10)),
-                'user_id' => auth()->id(),
+                'customer_id' => auth()->id(),
+                'coupon_id' => $coupon ? $coupon->id : null,
+                'coupon_code' => $coupon ? $coupon->code : null,
+                'coupon_discount' => $couponDiscount,
                 'status' => 'pending',
                 'subtotal' => $subtotal,
-                'shipping_fee' => $shippingFee,
+                'shipping_cost' => $shippingFee,
                 'tax' => $tax,
                 'total' => $total,
-                'shipping_address_id' => $shippingAddress->id,
-                'billing_address_id' => $billingAddress->id,
-                'notes' => $request->notes,
+                'payment_method' => $request->payment_method,
+                'payment_status' => 'pending',
+                'customer_notes' => $request->notes,
             ]);
 
             // Créer les items de commande avec calcul des commissions
@@ -196,6 +308,11 @@ class OrderController extends Controller
 
                 // Incrémenter le compteur de ventes
                 $product->increment('sales_count');
+            }
+
+            // Enregistrer l'utilisation du coupon
+            if ($coupon && ($couponDiscount > 0 || $freeShipping)) {
+                $coupon->recordUsage(auth()->user(), $order->id, $couponDiscount);
             }
 
             // Créer le paiement

@@ -318,19 +318,62 @@
                         @endforeach
                     </div>
 
+                    <!-- Code promo -->
+                    <div class="border-t border-gray-200 pt-4 mb-4" x-data="{
+                        code: '',
+                        validating: false,
+                        applied: false,
+                        discount: 0,
+                        type: '',
+                        message: '',
+                        error: false
+                    }">
+                        <label for="coupon_code" class="block text-sm font-medium text-gray-700 mb-2">Code promo</label>
+                        <div class="flex gap-2">
+                            <input type="text"
+                                   x-model="code"
+                                   name="coupon_code"
+                                   id="coupon_code"
+                                   placeholder="Entrez votre code"
+                                   class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm uppercase"
+                                   :disabled="applied">
+                            <button type="button"
+                                    @click="validateCoupon()"
+                                    :disabled="!code || validating || applied"
+                                    class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium transition">
+                                <span x-show="!validating">Appliquer</span>
+                                <span x-show="validating">...</span>
+                            </button>
+                            <button type="button"
+                                    x-show="applied"
+                                    @click="removeCoupon()"
+                                    class="px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 text-sm font-medium transition">
+                                ✕
+                            </button>
+                        </div>
+                        <div x-show="message"
+                             x-text="message"
+                             :class="error ? 'text-red-600' : 'text-green-600'"
+                             class="mt-2 text-sm font-medium"></div>
+                    </div>
+
                     <div class="border-t border-gray-200 pt-4 space-y-2">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Sous-total</span>
-                            <span class="font-medium text-gray-900">{{ number_format($cart->items->sum('subtotal'), 2) }} DT</span>
+                            <span class="font-medium text-gray-900" id="subtotal">{{ number_format($cart->items->sum('subtotal'), 2) }} DT</span>
+                        </div>
+                        <div class="flex justify-between text-sm" x-data x-show="$root.querySelector('[x-data]').discount > 0">
+                            <span class="text-green-600">Réduction</span>
+                            <span class="font-medium text-green-600" id="discount">-0.00 DT</span>
                         </div>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Frais de livraison</span>
-                            <span class="font-medium text-gray-900">Calculés après</span>
+                            <span class="font-medium text-gray-900" id="shipping">7.00 DT</span>
                         </div>
                         <div class="border-t border-gray-200 pt-2 mt-2">
                             <div class="flex justify-between">
                                 <span class="text-base font-semibold text-gray-900">Total</span>
-                                <span class="text-base font-semibold text-gray-900">{{ number_format($cart->items->sum('subtotal'), 2) }} DT</span>
+                                <span class="text-base font-semibold text-gray-900" id="total">{{ number_format($cart->items->sum('subtotal') + 7.00, 2) }} DT</span>
                             </div>
                         </div>
                     </div>
@@ -377,6 +420,87 @@
                 document.getElementById('shipping_postal_code').value = address.postal_code || '';
             }
         });
+    }
+
+    // Coupon validation and management
+    const subtotalAmount = {{ $cart->items->sum('subtotal') }};
+    const shippingFee = 7.00;
+
+    window.validateCoupon = function() {
+        const scope = this;
+        scope.validating = true;
+        scope.error = false;
+        scope.message = '';
+
+        fetch('{{ route('orders.validate-coupon') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                coupon_code: scope.code.toUpperCase(),
+                subtotal: subtotalAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            scope.validating = false;
+
+            if (data.valid) {
+                scope.applied = true;
+                scope.discount = data.discount;
+                scope.type = data.type;
+                scope.message = data.message;
+                scope.error = false;
+                updateTotals(scope.discount, scope.type);
+            } else {
+                scope.error = true;
+                scope.message = data.message;
+            }
+        })
+        .catch(error => {
+            scope.validating = false;
+            scope.error = true;
+            scope.message = 'Erreur lors de la validation du code promo.';
+            console.error('Error:', error);
+        });
+    };
+
+    window.removeCoupon = function() {
+        const scope = this;
+        scope.code = '';
+        scope.applied = false;
+        scope.discount = 0;
+        scope.type = '';
+        scope.message = '';
+        scope.error = false;
+        updateTotals(0, '');
+
+        // Clear the hidden input value
+        document.getElementById('coupon_code').value = '';
+    };
+
+    function updateTotals(discountAmount, couponType) {
+        const subtotalEl = document.getElementById('subtotal');
+        const discountEl = document.getElementById('discount');
+        const shippingEl = document.getElementById('shipping');
+        const totalEl = document.getElementById('total');
+
+        let shipping = shippingFee;
+
+        // Apply free shipping if coupon type is free_shipping
+        if (couponType === 'free_shipping') {
+            shipping = 0;
+        }
+
+        const total = subtotalAmount - discountAmount + shipping;
+
+        // Update display
+        subtotalEl.textContent = subtotalAmount.toFixed(2) + ' DT';
+        discountEl.textContent = '-' + discountAmount.toFixed(2) + ' DT';
+        shippingEl.textContent = shipping.toFixed(2) + ' DT';
+        totalEl.textContent = total.toFixed(2) + ' DT';
     }
 </script>
 @endpush

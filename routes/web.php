@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::middleware('client')->group(function () {
         Route::get('/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
         Route::post('/checkout', [OrderController::class, 'store'])->name('orders.store');
+        Route::post('/checkout/validate-coupon', [OrderController::class, 'validateCoupon'])->name('orders.validate-coupon');
         Route::get('/commande/{order}/confirmation', [OrderController::class, 'confirmation'])->name('orders.confirmation');
         Route::post('/commande/{order}/annuler', [OrderController::class, 'cancel'])->name('orders.cancel');
 
