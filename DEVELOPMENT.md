@@ -157,6 +157,8 @@
 30. **701ba7f** - Système de recherche avancée et filtres (multi-catégories, prix, notes, autocomplete, 6 options de tri)
 31. **ff24723** - Mise à jour DEVELOPMENT.md - Système de recherche complété
 32. **876964a** - Système complet de liste de souhaits/favoris (wishlist avec toggle AJAX, compteur temps réel)
+33. **0cd3b89** - Mise à jour DEVELOPMENT.md - Système wishlist complété
+34. **abc1ad2** - Backend complet système coupons/promotions (models, migrations, contrôleur admin, validation)
 
 ## 🚧 À Compléter
 
@@ -313,6 +315,33 @@
 - [x] Suppression depuis page favoris
 - [x] Pagination des favoris (24 par page)
 - [x] État vide avec CTA vers catalogue
+
+#### Système de Coupons et Promotions
+- [x] Migration coupons (code, type, value, conditions, dates, limits)
+- [x] Migration coupon_usage (tracking utilisation)
+- [x] Migration add coupon fields to orders
+- [x] Modèle Coupon avec logique complète
+- [x] Types de coupons: percentage, fixed, free_shipping
+- [x] Conditions: montant minimum, plafond de réduction
+- [x] Coupons spécifiques (catégories/produits)
+- [x] Période de validité (valid_from, valid_until)
+- [x] Limites d'utilisation (globale et par utilisateur)
+- [x] Statut actif/inactif
+- [x] Modèle CouponUsage pour analytics
+- [x] Order model étendu (coupon_id, code, discount)
+- [x] Méthodes Coupon: isValid(), canBeUsedBy(), calculateDiscount()
+- [x] Méthodes Coupon: recordUsage(), getValidationError()
+- [x] Scope active pour filtrer coupons valides
+- [x] Admin/CouponController complet (CRUD + stats)
+- [x] Routes admin pour gestion coupons
+- [x] Validation complète des champs
+- [x] Auto-génération codes coupons
+- [x] Prévention suppression coupons utilisés
+- [x] Statistiques d'utilisation (uses, discount, users)
+- [ ] Vues admin (index, create, edit, show)
+- [ ] Intégration checkout (application coupons)
+- [ ] Validation temps réel des coupons
+- [ ] Affichage réduction dans récapitulatif commande
 
 ### Tests (Priorité Moyenne)
 
