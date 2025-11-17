@@ -156,7 +156,7 @@
 29. **40ade41** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
 30. **701ba7f** - Système de recherche avancée et filtres (multi-catégories, prix, notes, autocomplete, 6 options de tri)
 31. **ff24723** - Mise à jour DEVELOPMENT.md - Système de recherche complété
-32. **En attente** - Système complet de liste de souhaits/favoris (wishlist avec toggle AJAX, compteur temps réel)
+32. **876964a** - Système complet de liste de souhaits/favoris (wishlist avec toggle AJAX, compteur temps réel)
 
 ## 🚧 À Compléter
 
