@@ -82,6 +82,16 @@ class Product extends Model
         return $this->hasMany(Wishlist::class);
     }
 
+    public function variants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function activeVariants(): HasMany
+    {
+        return $this->hasMany(ProductVariant::class)->where('is_active', true);
+    }
+
     /**
      * Calculer la note moyenne du produit
      */
@@ -178,5 +188,98 @@ class Product extends Model
     public function scopeInStock($query)
     {
         return $query->where('stock_quantity', '>', 0);
+    }
+
+    /**
+     * Check if product has variants.
+     */
+    public function hasVariants(): bool
+    {
+        return $this->variants()->exists();
+    }
+
+    /**
+     * Get default variant or first active variant.
+     */
+    public function getDefaultVariant(): ?ProductVariant
+    {
+        return $this->variants()
+            ->where('is_active', true)
+            ->where('is_default', true)
+            ->first()
+            ?? $this->variants()
+                ->where('is_active', true)
+                ->orderBy('position')
+                ->first();
+    }
+
+    /**
+     * Get product price (from variant if exists, otherwise from product).
+     */
+    public function getActivePrice(): float
+    {
+        if ($this->hasVariants()) {
+            $defaultVariant = $this->getDefaultVariant();
+            return $defaultVariant ? $defaultVariant->price : $this->price;
+        }
+
+        return $this->price;
+    }
+
+    /**
+     * Get total stock across all variants (if variants exist).
+     */
+    public function getTotalStock(): int
+    {
+        if ($this->hasVariants()) {
+            return $this->variants()
+                ->where('is_active', true)
+                ->sum('stock_quantity');
+        }
+
+        return $this->stock_quantity;
+    }
+
+    /**
+     * Check if product is available (considering variants).
+     */
+    public function isAvailable(): bool
+    {
+        if ($this->hasVariants()) {
+            return $this->variants()
+                ->where('is_active', true)
+                ->where('stock_quantity', '>', 0)
+                ->exists();
+        }
+
+        return $this->status === 'active' && $this->stock_quantity > 0;
+    }
+
+    /**
+     * Get price range for products with variants.
+     */
+    public function getPriceRange(): ?array
+    {
+        if (!$this->hasVariants()) {
+            return null;
+        }
+
+        $prices = $this->variants()
+            ->where('is_active', true)
+            ->pluck('price')
+            ->filter();
+
+        if ($prices->isEmpty()) {
+            return null;
+        }
+
+        $min = $prices->min();
+        $max = $prices->max();
+
+        return [
+            'min' => $min,
+            'max' => $max,
+            'same' => $min == $max,
+        ];
     }
 }
