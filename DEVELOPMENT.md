@@ -151,7 +151,8 @@
 24. **9f2a5b5** - Système complet d'intégration de paiements tunisiens (e-Dinar, Clictopay, Konnect)
 25. **757871b** - Système complet d'import CSV/Excel de produits (Laravel Excel, validation, template)
 26. **10aa745** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
-27. **En attente** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
+27. **74449e0** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
+28. **En attente** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
 
 ## 🚧 À Compléter
 
@@ -257,9 +258,14 @@
 - [x] Routes d'avis (clients + admin)
 - [x] Système de votes "utile" pour avis
 - [x] Modification d'avis limitée à 48h
-- [ ] Vue création d'avis
-- [ ] Vue modération admin
-- [ ] Affichage avis sur page produit
+- [x] Vue création d'avis (reviews/create.blade.php)
+- [x] Vue édition d'avis (reviews/edit.blade.php)
+- [x] Vue modération admin (admin/reviews/index.blade.php)
+- [x] Affichage avis sur page produit (avec distribution notes)
+- [x] Intégration dans ProductController
+- [x] Actions en masse pour modération (approuver/supprimer)
+- [x] Filtres admin (statut, note)
+- [x] Pagination des avis
 - [ ] Notification fournisseur nouvel avis
 - [ ] Notification client avis approuvé
 

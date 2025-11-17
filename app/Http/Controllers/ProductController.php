@@ -73,6 +73,20 @@ class ProductController extends Controller
         // Charger les relations
         $product->load(['supplier', 'images', 'category']);
 
+        // Charger les avis approuvés
+        $reviews = $product->approvedReviews()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        // Calculer les stats d'avis
+        $ratingDistribution = $product->getRatingDistribution();
+
+        // Vérifier si l'utilisateur peut laisser un avis
+        $canReview = auth()->check() &&
+                     $product->canBeReviewedBy(auth()->user()) &&
+                     !$product->hasReviewFrom(auth()->user());
+
         // Incrémenter le compteur de vues
         $product->increment('views_count');
 
@@ -85,7 +99,7 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('products.show', compact('product', 'relatedProducts'));
+        return view('products.show', compact('product', 'relatedProducts', 'reviews', 'ratingDistribution', 'canReview'));
     }
 
     /**
