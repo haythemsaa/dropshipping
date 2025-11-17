@@ -24,7 +24,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = auth()->user()->orders()
-            ->with(['items.product', 'payment'])
+            ->with(['items.product', 'items.variant', 'payment'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -43,6 +43,7 @@ class OrderController extends Controller
 
         $order->load([
             'items.product.images',
+            'items.variant',
             'items.supplier',
             'items.shipment',
             'shippingAddress',
@@ -65,7 +66,7 @@ class OrderController extends Controller
                 ->with('error', 'Votre panier est vide.');
         }
 
-        $cart->load(['items.product.supplier', 'items.product.images']);
+        $cart->load(['items.product.supplier', 'items.product.images', 'items.variant']);
 
         // Vérifier que tous les produits sont disponibles
         foreach ($cart->items as $item) {
@@ -74,9 +75,17 @@ class OrderController extends Controller
                     ->with('error', 'Un produit de votre panier n\'est plus disponible.');
             }
 
-            if (!$item->product->isInStock() || $item->product->stock_quantity < $item->quantity) {
-                return redirect()->route('cart.index')
-                    ->with('error', 'Stock insuffisant pour ' . $item->product->name);
+            // Vérifier le stock (variante ou produit)
+            if ($item->variant_id && $item->variant) {
+                if (!$item->variant->is_active || !$item->variant->isInStock() || $item->variant->stock_quantity < $item->quantity) {
+                    return redirect()->route('cart.index')
+                        ->with('error', 'Stock insuffisant pour ' . $item->getDisplayName());
+                }
+            } else {
+                if (!$item->product->isInStock() || $item->product->stock_quantity < $item->quantity) {
+                    return redirect()->route('cart.index')
+                        ->with('error', 'Stock insuffisant pour ' . $item->product->name);
+                }
             }
         }
 
@@ -185,7 +194,7 @@ class OrderController extends Controller
             $shippingFee = 7.00; // Frais de livraison standard en TND
             $tax = 0;
 
-            $cart->load('items.product.supplier');
+            $cart->load('items.product.supplier', 'items.variant');
 
             foreach ($cart->items as $item) {
                 // Vérifier la disponibilité
@@ -195,10 +204,19 @@ class OrderController extends Controller
                         ->with('error', 'Un produit n\'est plus disponible.');
                 }
 
-                if (!$item->product->isInStock() || $item->product->stock_quantity < $item->quantity) {
-                    DB::rollBack();
-                    return redirect()->route('cart.index')
-                        ->with('error', 'Stock insuffisant pour ' . $item->product->name);
+                // Vérifier le stock (variante ou produit)
+                if ($item->variant_id && $item->variant) {
+                    if (!$item->variant->is_active || !$item->variant->isInStock() || $item->variant->stock_quantity < $item->quantity) {
+                        DB::rollBack();
+                        return redirect()->route('cart.index')
+                            ->with('error', 'Stock insuffisant pour ' . $item->getDisplayName());
+                    }
+                } else {
+                    if (!$item->product->isInStock() || $item->product->stock_quantity < $item->quantity) {
+                        DB::rollBack();
+                        return redirect()->route('cart.index')
+                            ->with('error', 'Stock insuffisant pour ' . $item->product->name);
+                    }
                 }
 
                 $subtotal += $item->price * $item->quantity;
@@ -270,6 +288,7 @@ class OrderController extends Controller
             // Créer les items de commande avec calcul des commissions
             foreach ($cart->items as $cartItem) {
                 $product = $cartItem->product;
+                $variant = $cartItem->variant;
                 $supplier = $product->supplier;
 
                 $itemSubtotal = $cartItem->price * $cartItem->quantity;
@@ -282,6 +301,9 @@ class OrderController extends Controller
                 $orderItem = OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
+                    'variant_attributes' => $variant?->attributes,
+                    'variant_sku' => $variant?->sku,
                     'supplier_id' => $supplier->id,
                     'product_name' => $product->name,
                     'product_sku' => $product->sku,
@@ -303,8 +325,12 @@ class OrderController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Décrémenter le stock
-                $product->decrementStock($cartItem->quantity);
+                // Décrémenter le stock (variante ou produit)
+                if ($variant) {
+                    $variant->decreaseStock($cartItem->quantity);
+                } else {
+                    $product->decrementStock($cartItem->quantity);
+                }
 
                 // Incrémenter le compteur de ventes
                 $product->increment('sales_count');
@@ -363,6 +389,7 @@ class OrderController extends Controller
 
         $order->load([
             'items.product.images',
+            'items.variant',
             'items.supplier',
             'shippingAddress',
             'payment'

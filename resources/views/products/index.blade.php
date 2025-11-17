@@ -324,9 +324,17 @@
                                 <p class="text-sm text-gray-500 mb-3">{{ $product->supplier->business_name }}</p>
                                 <div class="flex justify-between items-center">
                                     <div>
-                                        <span class="text-2xl font-bold text-indigo-600">{{ number_format($product->price, 2) }} TND</span>
-                                        @if($product->stock_quantity > 0)
-                                            <p class="text-xs text-green-600 mt-1">En stock</p>
+                                        @php
+                                            $priceRange = $product->getPriceRange();
+                                        @endphp
+                                        @if($priceRange && !$priceRange['same'])
+                                            <span class="text-2xl font-bold text-indigo-600">{{ number_format($priceRange['min'], 2) }} - {{ number_format($priceRange['max'], 2) }} TND</span>
+                                            <p class="text-xs text-gray-500">Selon variante</p>
+                                        @else
+                                            <span class="text-2xl font-bold text-indigo-600">{{ number_format($product->getActivePrice(), 2) }} TND</span>
+                                            @if($product->getTotalStock() > 0)
+                                                <p class="text-xs text-green-600 mt-1">En stock</p>
+                                            @endif
                                         @endif
                                     </div>
                                     <form action="{{ route('cart.add') }}" method="POST">

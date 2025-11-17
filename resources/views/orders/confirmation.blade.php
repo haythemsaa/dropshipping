@@ -96,9 +96,17 @@
                 <div class="space-y-4">
                     @foreach($order->items as $item)
                         <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                            @if($item->product->images->first())
-                                <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                     alt="{{ $item->product->name }}"
+                            @php
+                                $imageUrl = null;
+                                if ($item->variant && $item->variant->image_path) {
+                                    $imageUrl = Storage::url($item->variant->image_path);
+                                } elseif ($item->product->images->first()) {
+                                    $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                }
+                            @endphp
+                            @if($imageUrl)
+                                <img src="{{ $imageUrl }}"
+                                     alt="{{ $item->getDisplayName() }}"
                                      class="w-20 h-20 object-cover rounded">
                             @else
                                 <div class="w-20 h-20 bg-gray-200 rounded flex items-center justify-center">
@@ -108,7 +116,10 @@
                                 </div>
                             @endif
                             <div class="flex-1">
-                                <h4 class="font-medium text-gray-900">{{ $item->product->name }}</h4>
+                                <h4 class="font-medium text-gray-900">{{ $item->getDisplayName() }}</h4>
+                                @if($item->variant_attributes)
+                                    <p class="text-xs text-gray-500">{{ $item->getFormattedVariantAttributes(true) }}</p>
+                                @endif
                                 <p class="text-sm text-gray-500">Par {{ $item->supplier->business_name ?? $item->supplier->name }}</p>
                                 <p class="text-sm text-gray-600 mt-1">Quantité: {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }} DT</p>
                             </div>

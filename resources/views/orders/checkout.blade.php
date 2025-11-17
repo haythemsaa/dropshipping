@@ -298,9 +298,17 @@
                     <div class="space-y-3 mb-4">
                         @foreach($cart->items as $item)
                             <div class="flex items-center space-x-3">
-                                @if($item->product->images->first())
-                                    <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                         alt="{{ $item->product->name }}"
+                                @php
+                                    $imageUrl = null;
+                                    if ($item->variant_id && $item->variant && $item->variant->image_path) {
+                                        $imageUrl = Storage::url($item->variant->image_path);
+                                    } elseif ($item->product->images->first()) {
+                                        $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                    }
+                                @endphp
+                                @if($imageUrl)
+                                    <img src="{{ $imageUrl }}"
+                                         alt="{{ $item->getDisplayName() }}"
                                          class="w-16 h-16 object-cover rounded">
                                 @else
                                     <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
@@ -310,10 +318,13 @@
                                     </div>
                                 @endif
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $item->product->name }}</p>
+                                    <p class="text-sm font-medium text-gray-900 truncate">{{ $item->getDisplayName() }}</p>
+                                    @if($item->variant_id && $item->variant)
+                                        <p class="text-xs text-gray-500">{{ $item->variant->getFormattedAttributes() }}</p>
+                                    @endif
                                     <p class="text-sm text-gray-500">Qté: {{ $item->quantity }}</p>
                                 </div>
-                                <p class="text-sm font-medium text-gray-900">{{ number_format($item->subtotal, 2) }} DT</p>
+                                <p class="text-sm font-medium text-gray-900">{{ number_format($item->price * $item->quantity, 2) }} DT</p>
                             </div>
                         @endforeach
                     </div>

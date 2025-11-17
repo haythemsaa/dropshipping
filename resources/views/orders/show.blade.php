@@ -205,9 +205,17 @@
                     <div class="p-6 space-y-4">
                         @foreach($items as $item)
                             <div class="flex items-start space-x-4">
-                                @if($item->product->images->first())
-                                    <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                         alt="{{ $item->product->name }}"
+                                @php
+                                    $imageUrl = null;
+                                    if ($item->variant && $item->variant->image_path) {
+                                        $imageUrl = Storage::url($item->variant->image_path);
+                                    } elseif ($item->product->images->first()) {
+                                        $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                    }
+                                @endphp
+                                @if($imageUrl)
+                                    <img src="{{ $imageUrl }}"
+                                         alt="{{ $item->getDisplayName() }}"
                                          class="w-24 h-24 object-cover rounded-lg">
                                 @else
                                     <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
@@ -218,8 +226,11 @@
                                 @endif
 
                                 <div class="flex-1 min-w-0">
-                                    <h4 class="text-base font-medium text-gray-900">{{ $item->product->name }}</h4>
-                                    <p class="text-sm text-gray-600 mt-1">SKU: {{ $item->product->sku }}</p>
+                                    <h4 class="text-base font-medium text-gray-900">{{ $item->getDisplayName() }}</h4>
+                                    @if($item->variant_attributes)
+                                        <p class="text-xs text-gray-500 mt-1">{{ $item->getFormattedVariantAttributes(true) }}</p>
+                                    @endif
+                                    <p class="text-sm text-gray-600 mt-1">SKU: {{ $item->getSku() }}</p>
                                     <div class="mt-2 flex items-center">
                                         <p class="text-sm text-gray-600">
                                             Quantité: <span class="font-medium">{{ $item->quantity }}</span>

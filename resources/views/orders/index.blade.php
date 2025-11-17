@@ -104,9 +104,17 @@
                             <!-- Product Images -->
                             <div class="flex -space-x-2 overflow-hidden">
                                 @foreach($order->items->take(3) as $item)
-                                    @if($item->product->images->first())
-                                        <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                             alt="{{ $item->product->name }}"
+                                    @php
+                                        $imageUrl = null;
+                                        if ($item->variant && $item->variant->image_path) {
+                                            $imageUrl = Storage::url($item->variant->image_path);
+                                        } elseif ($item->product->images->first()) {
+                                            $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                        }
+                                    @endphp
+                                    @if($imageUrl)
+                                        <img src="{{ $imageUrl }}"
+                                             alt="{{ $item->getDisplayName() }}"
                                              class="inline-block h-16 w-16 rounded-lg ring-2 ring-white object-cover">
                                     @else
                                         <div class="inline-block h-16 w-16 rounded-lg ring-2 ring-white bg-gray-200 flex items-center justify-center">

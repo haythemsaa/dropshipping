@@ -11,6 +11,9 @@ class OrderItem extends Model
     protected $fillable = [
         'order_id',
         'product_id',
+        'variant_id',
+        'variant_attributes',
+        'variant_sku',
         'supplier_id',
         'product_name',
         'product_sku',
@@ -30,6 +33,7 @@ class OrderItem extends Model
         'supplier_amount' => 'decimal:2',
         'commission_amount' => 'decimal:2',
         'commission_rate' => 'decimal:2',
+        'variant_attributes' => 'array',
     ];
 
     public function order(): BelongsTo
@@ -45,6 +49,11 @@ class OrderItem extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'supplier_id');
+    }
+
+    public function variant(): BelongsTo
+    {
+        return $this->belongsTo(ProductVariant::class, 'variant_id');
     }
 
     public function shipment(): HasOne
@@ -67,5 +76,48 @@ class OrderItem extends Model
         $this->commission_amount = ($this->subtotal * $commissionRate) / 100;
         $this->supplier_amount = $this->subtotal - $this->commission_amount;
         $this->save();
+    }
+
+    /**
+     * Get display name with variant attributes
+     */
+    public function getDisplayName(): string
+    {
+        $name = $this->product_name;
+
+        if ($this->variant_attributes) {
+            $attributes = collect($this->variant_attributes)
+                ->values()
+                ->implode(' / ');
+            $name .= ' - ' . $attributes;
+        }
+
+        return $name;
+    }
+
+    /**
+     * Get formatted variant attributes
+     */
+    public function getFormattedVariantAttributes(bool $withLabels = false): string
+    {
+        if (empty($this->variant_attributes)) {
+            return '';
+        }
+
+        if ($withLabels) {
+            return collect($this->variant_attributes)
+                ->map(fn($value, $key) => ucfirst($key) . ': ' . $value)
+                ->implode(', ');
+        }
+
+        return collect($this->variant_attributes)->values()->implode(' / ');
+    }
+
+    /**
+     * Get the SKU (variant SKU if available, otherwise product SKU)
+     */
+    public function getSku(): string
+    {
+        return $this->variant_sku ?? $this->product_sku;
     }
 }
