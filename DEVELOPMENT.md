@@ -153,7 +153,7 @@
 26. **10aa745** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
 27. **74449e0** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
 28. **593a7d0** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
-29. **En attente** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
+29. **40ade41** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
 
 ## 🚧 À Compléter
 
@@ -272,6 +272,25 @@
 - [x] Intégration notifications dans ReviewController
 - [x] Intégration notifications dans Admin\ReviewController
 - [x] Notifications en masse (bulk approve)
+
+#### Recherche & Filtres Avancés
+- [x] Filtres multi-catégories avec sous-catégories
+- [x] Filtre par fourchette de prix (min-max)
+- [x] Filtre par note minimum (1-5 étoiles)
+- [x] Filtre par disponibilité en stock
+- [x] Recherche par mots-clés (nom, description, SKU, catégorie)
+- [x] Système d'autocomplete avec debounce (300ms)
+- [x] API autocomplete (route /produits/autocomplete)
+- [x] 6 options de tri (récent, populaire, meilleures notes, prix asc/desc, nom A-Z)
+- [x] Préservation des filtres avec pagination (withQueryString)
+- [x] Interface responsive avec filtres sidebar
+- [x] Bouton toggle filtres mobile avec Alpine.js
+- [x] Affichage stats (total produits, fourchette prix)
+- [x] Bouton réinitialisation filtres
+- [x] État vide amélioré avec suggestions
+- [x] Affichage des notes sur cartes produits
+- [x] ProductController mis à jour avec logique de filtrage
+- [x] Vue products/index.blade.php réécrite complètement
 
 ### Tests (Priorité Moyenne)
 

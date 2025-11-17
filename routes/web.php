@@ -32,6 +32,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Catalogue produits
 Route::get('/produits', [ProductController::class, 'index'])->name('products.index');
 Route::get('/produits/recherche', [ProductController::class, 'search'])->name('products.search');
+Route::get('/produits/autocomplete', [ProductController::class, 'autocomplete'])->name('products.autocomplete');
 Route::get('/categorie/{category:slug}', [ProductController::class, 'category'])->name('products.category');
 Route::get('/produit/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 

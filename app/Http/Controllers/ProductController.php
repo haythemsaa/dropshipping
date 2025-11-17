@@ -17,19 +17,51 @@ class ProductController extends Controller
             ->where('status', 'active')
             ->whereNotNull('approved_at');
 
-        // Filtrer par catégorie si spécifié
-        if ($request->has('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
+        // Filtrer par catégorie(s) - support multi-sélection
+        if ($request->has('categories') && !empty($request->categories)) {
+            $categoryIds = is_array($request->categories) ? $request->categories : [$request->categories];
+
+            // Inclure les sous-catégories
+            $allCategoryIds = [];
+            foreach ($categoryIds as $catId) {
+                $allCategoryIds[] = $catId;
+                $subCategories = Category::where('parent_id', $catId)->pluck('id')->toArray();
+                $allCategoryIds = array_merge($allCategoryIds, $subCategories);
+            }
+
+            $query->whereIn('category_id', $allCategoryIds);
         }
 
         // Filtrer par prix
-        if ($request->has('prix_min')) {
+        if ($request->filled('prix_min')) {
             $query->where('price', '>=', $request->prix_min);
         }
-        if ($request->has('prix_max')) {
+        if ($request->filled('prix_max')) {
             $query->where('price', '<=', $request->prix_max);
+        }
+
+        // Filtrer par stock disponible
+        if ($request->has('en_stock') && $request->en_stock == '1') {
+            $query->where('stock_quantity', '>', 0);
+        }
+
+        // Filtrer par note moyenne
+        if ($request->filled('note_min')) {
+            $query->withAvg('approvedReviews as avg_rating', 'rating')
+                  ->having('avg_rating', '>=', $request->note_min);
+        }
+
+        // Recherche par mot-clé
+        if ($request->filled('q')) {
+            $searchTerm = $request->q;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('description', 'LIKE', "%{$searchTerm}%")
+                  ->orWhere('sku', 'LIKE', "%{$searchTerm}%")
+                  ->orWhereHas('category', function ($q2) use ($searchTerm) {
+                      $q2->where('name', 'LIKE', "%{$searchTerm}%");
+                  });
+            });
         }
 
         // Tri
@@ -44,20 +76,36 @@ class ProductController extends Controller
             case 'populaire':
                 $query->orderBy('sales_count', 'desc');
                 break;
+            case 'meilleures_notes':
+                $query->withAvg('approvedReviews as avg_rating', 'rating')
+                      ->orderBy('avg_rating', 'desc');
+                break;
+            case 'nom_asc':
+                $query->orderBy('name', 'asc');
+                break;
             case 'recent':
             default:
                 $query->orderBy('created_at', 'desc');
                 break;
         }
 
-        $products = $query->paginate(24);
+        $products = $query->paginate(24)->withQueryString();
 
-        $categories = Category::whereNull('parent_id')
-            ->where('is_active', true)
+        // Récupérer toutes les catégories pour les filtres
+        $categories = Category::where('is_active', true)
+            ->with('children')
+            ->whereNull('parent_id')
             ->orderBy('order')
             ->get();
 
-        return view('products.index', compact('products', 'categories'));
+        // Statistiques pour l'affichage
+        $stats = [
+            'total' => $products->total(),
+            'prix_min' => Product::where('status', 'active')->whereNotNull('approved_at')->min('price') ?? 0,
+            'prix_max' => Product::where('status', 'active')->whereNotNull('approved_at')->max('price') ?? 1000,
+        ];
+
+        return view('products.index', compact('products', 'categories', 'stats'));
     }
 
     /**
@@ -131,28 +179,46 @@ class ProductController extends Controller
      */
     public function search(Request $request)
     {
-        $query = $request->get('q', '');
+        $searchQuery = $request->get('q', '');
 
-        if (empty($query)) {
+        if (empty($searchQuery)) {
             return redirect()->route('products.index');
         }
 
-        $products = Product::with(['supplier', 'images', 'category'])
-            ->where('status', 'active')
+        // Utiliser la même logique de filtrage que index()
+        return $this->index($request);
+    }
+
+    /**
+     * API pour l'autocomplete de recherche
+     */
+    public function autocomplete(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where('status', 'active')
             ->whereNotNull('approved_at')
             ->where(function ($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('description', 'LIKE', "%{$query}%")
-                    ->orWhere('sku', 'LIKE', "%{$query}%");
+                  ->orWhere('sku', 'LIKE', "%{$query}%");
             })
-            ->orderBy('created_at', 'desc')
-            ->paginate(24);
+            ->select('id', 'name', 'slug', 'price')
+            ->limit(10)
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'price' => number_format($product->price, 2),
+                    'url' => route('products.show', $product->slug),
+                ];
+            });
 
-        $categories = Category::whereNull('parent_id')
-            ->where('is_active', true)
-            ->orderBy('order')
-            ->get();
-
-        return view('products.search', compact('products', 'query', 'categories'));
+        return response()->json($products);
     }
 }
