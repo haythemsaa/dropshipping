@@ -305,8 +305,16 @@
                 </form>
             </div>
 
-            <div x-show="currentStock <= 0" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <p class="text-red-700">Ce produit est actuellement en rupture de stock</p>
+            <!-- Stock Alert Form when out of stock -->
+            <div x-show="currentStock <= 0" class="mb-6">
+                @if($product->hasVariants())
+                    <x-stock-alert-form
+                        :product-id="$product->id"
+                        x-bind:variant-id="selectedVariant ? selectedVariant.id : null"
+                    />
+                @else
+                    <x-stock-alert-form :product-id="$product->id" />
+                @endif
             </div>
 
             <!-- Product Details -->

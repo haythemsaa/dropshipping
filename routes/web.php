@@ -23,6 +23,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ComparisonController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\StockAlertController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\Supplier\ProductVariantController as SupplierProductVariantController;
 
@@ -34,6 +35,9 @@ use App\Http\Controllers\Supplier\ProductVariantController as SupplierProductVar
 
 // Page d'accueil
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// FAQ
+Route::view('/faq', 'faq')->name('faq');
 
 // Catalogue produits
 Route::get('/produits', [ProductController::class, 'index'])->name('products.index');
@@ -59,6 +63,9 @@ Route::get('/comparaison/count', [ComparisonController::class, 'count'])->name('
 // Newsletter
 Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+
+// Stock Alerts
+Route::post('/stock-alerts/subscribe', [StockAlertController::class, 'subscribe'])->name('stock-alerts.subscribe');
 
 /*
 |--------------------------------------------------------------------------

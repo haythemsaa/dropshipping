@@ -394,6 +394,11 @@
                         Confirmer la commande
                     </button>
 
+                    <!-- Trust Badges -->
+                    <div class="mt-6">
+                        <x-trust-badges layout="vertical" class="border-t border-gray-200 pt-4" />
+                    </div>
+
                     <p class="mt-4 text-xs text-gray-500 text-center">
                         En passant commande, vous acceptez nos
                         <a href="#" class="text-indigo-600 hover:text-indigo-700">conditions générales de vente</a>
