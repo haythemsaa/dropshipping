@@ -168,6 +168,7 @@
 41. **469b31a** - Intégration frontend variantes (selector Alpine.js, cart support, images dynamiques)
 42. **55d7750** - Intégration complète variantes dans commandes (OrderItem snapshot, stock management, price ranges)
 43. **9582a2d** - Support variantes vues supplier/admin + notifications email + seeder données test
+44. **60e38ef** - Exports Excel variantes + Analytics complètes (ventes, revenus, stock alerts)
 
 ## 🚧 À Compléter
 
@@ -402,6 +403,13 @@
 - [x] Notifications email enrichies (OrderConfirmation, NewOrderNotification avec détails variantes)
 - [x] ProductVariantSeeder complet (3 attributs, 5 couleurs, 4 tailles, génération auto variantes)
 - [x] Données de test réalistes (12 variantes mode, 4 variantes électronique)
+- [x] SupplierOrdersExport étendu (colonne variante avec attributs formatés)
+- [x] SupplierProductVariantsExport complet (11 colonnes avec stats ventes 30j)
+- [x] ProductVariant analytics methods (getTotalSales, getTotalRevenue, getSalesForPeriod, getRevenueForPeriod)
+- [x] Stock status helpers (isLowStock, getStockStatusLabel, getStockStatusColor)
+- [x] Relation orderItems() dans ProductVariant pour calculs analytics
+- [x] Export filtrable (statut, stock faible, par produit)
+- [x] Route export variantes (/fournisseur/variantes/export)
 
 ### Tests (Priorité Moyenne)
 
