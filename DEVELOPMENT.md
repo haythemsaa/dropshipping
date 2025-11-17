@@ -159,6 +159,8 @@
 32. **876964a** - Système complet de liste de souhaits/favoris (wishlist avec toggle AJAX, compteur temps réel)
 33. **0cd3b89** - Mise à jour DEVELOPMENT.md - Système wishlist complété
 34. **abc1ad2** - Backend complet système coupons/promotions (models, migrations, contrôleur admin, validation)
+35. **bf68681** - Vues admin complètes système coupons (index, create, edit, show avec stats et filtres)
+36. **6d93797** - Intégration checkout coupons (AJAX validation, interface Alpine.js, calcul dynamique totaux)
 
 ## 🚧 À Compléter
 
@@ -338,10 +340,15 @@
 - [x] Auto-génération codes coupons
 - [x] Prévention suppression coupons utilisés
 - [x] Statistiques d'utilisation (uses, discount, users)
-- [ ] Vues admin (index, create, edit, show)
-- [ ] Intégration checkout (application coupons)
-- [ ] Validation temps réel des coupons
-- [ ] Affichage réduction dans récapitulatif commande
+- [x] Vues admin (index, create, edit, show)
+- [x] Intégration checkout (application coupons avec AJAX)
+- [x] Validation temps réel des coupons (API endpoint)
+- [x] Affichage réduction dans récapitulatif commande
+- [x] Interface utilisateur Alpine.js réactive
+- [x] Gestion free shipping dans calcul total
+- [x] Toggle activer/désactiver coupons admin
+- [x] Filtres et recherche coupons admin
+- [x] Dashboard stats coupons (total, actifs, expirés)
 
 ### Tests (Priorité Moyenne)
 
