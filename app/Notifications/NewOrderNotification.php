@@ -36,25 +36,37 @@ class NewOrderNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Count items for this supplier
-        $supplierItems = $this->order->items()->whereHas('product', function($query) use ($notifiable) {
+        $supplierItems = $this->order->items()->with('variant')->whereHas('product', function($query) use ($notifiable) {
             $query->where('supplier_id', $notifiable->id);
         })->get();
 
         $itemCount = $supplierItems->count();
         $totalAmount = $supplierItems->sum('subtotal');
 
-        return (new MailMessage)
+        $message = (new MailMessage)
             ->subject("Nouvelle commande #{$this->order->order_number}")
             ->greeting("Bonjour {$notifiable->name},")
             ->line("Vous avez reçu une nouvelle commande !")
             ->line("**Détails de la commande :**")
-            ->line("Numéro : **#{$this->order->order_number}**")
-            ->line("Articles concernés : **{$itemCount}**")
-            ->line("Montant total : **" . number_format($totalAmount, 2) . " DT**")
+            ->line("Numéro : **#{$this->order->order_number}**");
+
+        // Ajouter les articles du fournisseur
+        $message->line("**Articles à préparer :**");
+        foreach ($supplierItems as $item) {
+            $itemLine = "- {$item->getDisplayName()} (Qté: {$item->quantity}) - {$item->subtotal} DT";
+            if ($item->variant_attributes) {
+                $itemLine .= " [{$item->getFormattedVariantAttributes(true)}]";
+            }
+            $message->line($itemLine);
+        }
+
+        $message->line("**Montant total : " . number_format($totalAmount, 2) . " DT**")
             ->action('Voir la commande', route('supplier.orders.show', $this->order))
             ->line("Veuillez préparer les articles pour expédition dès que possible.")
             ->line("Merci de votre collaboration !")
             ->salutation('L\'équipe Dropshipping Tunisia');
+
+        return $message;
     }
 
     /**

@@ -78,9 +78,17 @@
                     @foreach($myItems as $item)
                         <div class="border border-gray-200 rounded-lg p-4">
                             <div class="flex items-start space-x-4">
-                                @if($item->product->images->first())
-                                    <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                         alt="{{ $item->product->name }}"
+                                @php
+                                    $imageUrl = null;
+                                    if ($item->variant && $item->variant->image_path) {
+                                        $imageUrl = Storage::url($item->variant->image_path);
+                                    } elseif ($item->product->images->first()) {
+                                        $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                    }
+                                @endphp
+                                @if($imageUrl)
+                                    <img src="{{ $imageUrl }}"
+                                         alt="{{ $item->getDisplayName() }}"
                                          class="w-24 h-24 object-cover rounded">
                                 @else
                                     <div class="w-24 h-24 bg-gray-200 rounded flex items-center justify-center">
@@ -93,8 +101,11 @@
                                 <div class="flex-1">
                                     <div class="flex items-start justify-between">
                                         <div>
-                                            <h3 class="font-medium text-gray-900">{{ $item->product->name }}</h3>
-                                            <p class="text-sm text-gray-600 mt-1">SKU: {{ $item->product->sku }}</p>
+                                            <h3 class="font-medium text-gray-900">{{ $item->getDisplayName() }}</h3>
+                                            @if($item->variant_attributes)
+                                                <p class="text-xs text-gray-500 mt-1">{{ $item->getFormattedVariantAttributes(true) }}</p>
+                                            @endif
+                                            <p class="text-sm text-gray-600 mt-1">SKU: {{ $item->getSku() }}</p>
                                             <p class="text-sm text-gray-600">Quantité: {{ $item->quantity }} × {{ number_format($item->unit_price, 2) }} DT</p>
                                         </div>
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium

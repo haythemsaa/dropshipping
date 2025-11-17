@@ -35,18 +35,29 @@ class OrderConfirmation extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        $this->order->load('items.variant');
+
+        $message = (new MailMessage)
             ->subject("Confirmation de commande #{$this->order->order_number}")
             ->greeting("Bonjour {$notifiable->name},")
             ->line("Merci pour votre commande ! Nous avons bien reçu votre commande #{$this->order->order_number}.")
-            ->line("**Récapitulatif de votre commande :**")
-            ->line("Montant total : **{$this->order->total_amount} DT**")
+            ->line("**Récapitulatif de votre commande :**");
+
+        // Ajouter les articles
+        foreach ($this->order->items as $item) {
+            $itemLine = "- {$item->getDisplayName()} (Qté: {$item->quantity}) - {$item->subtotal} DT";
+            $message->line($itemLine);
+        }
+
+        $message->line("**Montant total : {$this->order->total_amount} DT**")
             ->line("Statut : **" . $this->getStatusLabel($this->order->status) . "**")
             ->line("Mode de paiement : **" . $this->getPaymentMethodLabel($this->order->payment_method) . "**")
             ->action('Voir ma commande', route('orders.show', $this->order))
             ->line("Vous recevrez une notification dès que votre commande sera expédiée.")
             ->line("Merci de votre confiance !")
             ->salutation('L\'équipe Dropshipping Tunisia');
+
+        return $message;
     }
 
     /**
