@@ -161,6 +161,11 @@
 34. **abc1ad2** - Backend complet système coupons/promotions (models, migrations, contrôleur admin, validation)
 35. **bf68681** - Vues admin complètes système coupons (index, create, edit, show avec stats et filtres)
 36. **6d93797** - Intégration checkout coupons (AJAX validation, interface Alpine.js, calcul dynamique totaux)
+37. **8700a54** - Backend système de variantes produits (migrations, modèles avec 15+ méthodes)
+38. **b9b64e3** - Routes et contrôleurs variantes (admin attributs, supplier variants avec génération bulk)
+39. **6dacb08** - Vues admin gestion attributs (index avec modals, values avec color picker)
+40. **442adf2** - Vues supplier gestion variantes (index avec stats, create/edit, génération bulk)
+41. **469b31a** - Intégration frontend variantes (selector Alpine.js, cart support, images dynamiques)
 
 ## 🚧 À Compléter
 
@@ -349,6 +354,40 @@
 - [x] Toggle activer/désactiver coupons admin
 - [x] Filtres et recherche coupons admin
 - [x] Dashboard stats coupons (total, actifs, expirés)
+
+#### Système de Variantes Produits (Gestion Avancée)
+- [x] Migration product_attributes (name, slug, display_type: select/color/button)
+- [x] Migration product_attribute_values (value, color_code, image_path)
+- [x] Migration product_variants (SKU, price, stock, attributes JSON, variant_id)
+- [x] Migration add variant_id to cart_items (support panier)
+- [x] Modèle ProductAttribute (relations, scopes, helpers)
+- [x] Modèle ProductAttributeValue (color/image support)
+- [x] Modèle ProductVariant (15+ méthodes: stock, pricing, display)
+- [x] Product model étendu (hasVariants, getDefaultVariant, getPriceRange, etc.)
+- [x] CartItem model étendu (variant relation, getDisplayName avec attributs)
+- [x] Supplier/ProductVariantController complet (CRUD + bulk generation)
+- [x] Admin/ProductAttributeController (gestion attributs globaux + valeurs)
+- [x] Routes supplier variantes (/fournisseur/produits/{product}/variantes)
+- [x] Routes admin attributs (/admin/attributs)
+- [x] Génération bulk de combinaisons (Cartesian product algorithm)
+- [x] Vue admin/attributes/index.blade.php (liste + modals create/edit)
+- [x] Vue admin/attributes/values.blade.php (gestion valeurs + color picker)
+- [x] Vue supplier/variants/index.blade.php (stats dashboard + table + bulk modal)
+- [x] Vue supplier/variants/create.blade.php (form avec attributs dynamiques)
+- [x] Vue supplier/variants/edit.blade.php (form édition + image management)
+- [x] Intégration products/show.blade.php (selector Alpine.js)
+- [x] 3 types d'affichage: color swatches, buttons, select dropdown
+- [x] Updates dynamiques: prix, stock, SKU, images selon sélection
+- [x] Pre-sélection variante par défaut au chargement page
+- [x] CartController étendu (validation variant, stock checks, cart merge)
+- [x] Cart views mises à jour (display variant attrs, images, SKU)
+- [x] Stock management par variante (decrease, increase, isInStock)
+- [x] Système default variant (setAsDefault, unset others)
+- [x] Formatted attributes display ("Rouge / M", "Couleur: Rouge, Taille: M")
+- [x] Variant-specific images avec fallback sur images produit
+- [x] Positionnement et tri des attributs/valeurs
+- [x] Validation SKU unique par variante
+- [x] Gestion active/inactive variantes
 
 ### Tests (Priorité Moyenne)
 
