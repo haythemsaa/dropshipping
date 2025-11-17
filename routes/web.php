@@ -18,9 +18,11 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\ProductAttributeController as AdminProductAttributeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PaymentWebhookController;
+use App\Http\Controllers\Supplier\ProductVariantController as SupplierProductVariantController;
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +126,16 @@ Route::middleware(['auth', 'verified', 'active', 'supplier'])->prefix('fournisse
     // Export de produits
     Route::get('/produits/export', [SupplierProductController::class, 'export'])->name('products.export');
 
+    // Gestion des variantes de produits
+    Route::get('/produits/{product}/variantes', [SupplierProductVariantController::class, 'index'])->name('products.variants.index');
+    Route::get('/produits/{product}/variantes/create', [SupplierProductVariantController::class, 'create'])->name('products.variants.create');
+    Route::post('/produits/{product}/variantes', [SupplierProductVariantController::class, 'store'])->name('products.variants.store');
+    Route::get('/produits/{product}/variantes/{variant}/edit', [SupplierProductVariantController::class, 'edit'])->name('products.variants.edit');
+    Route::patch('/produits/{product}/variantes/{variant}', [SupplierProductVariantController::class, 'update'])->name('products.variants.update');
+    Route::delete('/produits/{product}/variantes/{variant}', [SupplierProductVariantController::class, 'destroy'])->name('products.variants.destroy');
+    Route::post('/produits/{product}/variantes/generate-bulk', [SupplierProductVariantController::class, 'generateBulk'])->name('products.variants.generate-bulk');
+    Route::post('/produits/{product}/variantes/{variant}/toggle-status', [SupplierProductVariantController::class, 'toggleStatus'])->name('products.variants.toggle-status');
+
     // Gestion des commandes
     Route::get('/commandes', [SupplierOrderController::class, 'index'])->name('orders.index');
     Route::get('/commandes/{order}', [SupplierOrderController::class, 'show'])->name('orders.show');
@@ -211,6 +223,20 @@ Route::middleware(['auth', 'verified', 'active', 'admin'])->prefix('admin')->nam
     Route::patch('/coupons/{coupon}', [AdminCouponController::class, 'update'])->name('coupons.update');
     Route::delete('/coupons/{coupon}', [AdminCouponController::class, 'destroy'])->name('coupons.destroy');
     Route::post('/coupons/{coupon}/toggle-status', [AdminCouponController::class, 'toggleStatus'])->name('coupons.toggle-status');
+
+    // Gestion des attributs de produits
+    Route::get('/attributs', [AdminProductAttributeController::class, 'index'])->name('attributes.index');
+    Route::post('/attributs', [AdminProductAttributeController::class, 'store'])->name('attributes.store');
+    Route::patch('/attributs/{attribute}', [AdminProductAttributeController::class, 'update'])->name('attributes.update');
+    Route::delete('/attributs/{attribute}', [AdminProductAttributeController::class, 'destroy'])->name('attributes.destroy');
+    Route::post('/attributs/{attribute}/toggle-status', [AdminProductAttributeController::class, 'toggleStatus'])->name('attributes.toggle-status');
+
+    // Gestion des valeurs d'attributs
+    Route::get('/attributs/{attribute}/valeurs', [AdminProductAttributeController::class, 'values'])->name('attributes.values');
+    Route::post('/attributs/{attribute}/valeurs', [AdminProductAttributeController::class, 'storeValue'])->name('attributes.values.store');
+    Route::patch('/attributs/{attribute}/valeurs/{value}', [AdminProductAttributeController::class, 'updateValue'])->name('attributes.values.update');
+    Route::delete('/attributs/{attribute}/valeurs/{value}', [AdminProductAttributeController::class, 'destroyValue'])->name('attributes.values.destroy');
+    Route::post('/attributs/{attribute}/valeurs/{value}/toggle-status', [AdminProductAttributeController::class, 'toggleValueStatus'])->name('attributes.values.toggle-status');
 });
 
 /*
