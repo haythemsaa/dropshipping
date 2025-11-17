@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -33,33 +34,68 @@ class CartController extends Controller
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
+            'variant_id' => 'nullable|exists:product_variants,id',
             'quantity' => 'required|integer|min:1',
         ]);
 
         $product = Product::findOrFail($request->product_id);
+        $variant = null;
 
         // Vérifier que le produit est disponible
         if ($product->status !== 'active' || !$product->approved_at) {
             return back()->with('error', 'Ce produit n\'est pas disponible.');
         }
 
-        // Vérifier le stock
-        if (!$product->isInStock() || $product->stock_quantity < $request->quantity) {
-            return back()->with('error', 'Stock insuffisant pour ce produit.');
+        // Si une variante est sélectionnée
+        if ($request->variant_id) {
+            $variant = ProductVariant::findOrFail($request->variant_id);
+
+            // Vérifier que la variante appartient au produit
+            if ($variant->product_id !== $product->id) {
+                return back()->with('error', 'Variante invalide pour ce produit.');
+            }
+
+            // Vérifier que la variante est active et en stock
+            if (!$variant->is_active) {
+                return back()->with('error', 'Cette variante n\'est pas disponible.');
+            }
+
+            if ($variant->stock_quantity < $request->quantity) {
+                return back()->with('error', 'Stock insuffisant pour cette variante.');
+            }
+
+            $price = $variant->price;
+            $availableStock = $variant->stock_quantity;
+        } else {
+            // Vérifier le stock du produit principal
+            if (!$product->isInStock() || $product->stock_quantity < $request->quantity) {
+                return back()->with('error', 'Stock insuffisant pour ce produit.');
+            }
+
+            $price = $product->price;
+            $availableStock = $product->stock_quantity;
         }
 
         DB::beginTransaction();
         try {
             $cart = $this->getOrCreateCart();
 
-            // Vérifier si le produit est déjà dans le panier
-            $cartItem = $cart->items()->where('product_id', $product->id)->first();
+            // Vérifier si le produit/variante est déjà dans le panier
+            $cartItemQuery = $cart->items()->where('product_id', $product->id);
+
+            if ($variant) {
+                $cartItemQuery->where('variant_id', $variant->id);
+            } else {
+                $cartItemQuery->whereNull('variant_id');
+            }
+
+            $cartItem = $cartItemQuery->first();
 
             if ($cartItem) {
                 // Mettre à jour la quantité
                 $newQuantity = $cartItem->quantity + $request->quantity;
 
-                if ($product->stock_quantity < $newQuantity) {
+                if ($availableStock < $newQuantity) {
                     DB::rollBack();
                     return back()->with('error', 'Stock insuffisant pour cette quantité.');
                 }
@@ -69,8 +105,9 @@ class CartController extends Controller
                 // Créer un nouvel item
                 $cart->items()->create([
                     'product_id' => $product->id,
+                    'variant_id' => $variant?->id,
                     'quantity' => $request->quantity,
-                    'price' => $product->price,
+                    'price' => $price,
                 ]);
             }
 
@@ -98,10 +135,14 @@ class CartController extends Controller
             abort(403);
         }
 
-        $product = $cartItem->product;
+        // Vérifier le stock (variante ou produit)
+        if ($cartItem->variant_id && $cartItem->variant) {
+            $availableStock = $cartItem->variant->stock_quantity;
+        } else {
+            $availableStock = $cartItem->product->stock_quantity;
+        }
 
-        // Vérifier le stock
-        if ($product->stock_quantity < $request->quantity) {
+        if ($availableStock < $request->quantity) {
             return back()->with('error', 'Stock insuffisant pour cette quantité.');
         }
 
@@ -180,9 +221,17 @@ class CartController extends Controller
         if ($sessionCart) {
             // Fusionner les items
             foreach ($sessionCart->items as $sessionItem) {
-                $existingItem = $userCart->items()
-                    ->where('product_id', $sessionItem->product_id)
-                    ->first();
+                $existingItemQuery = $userCart->items()
+                    ->where('product_id', $sessionItem->product_id);
+
+                // Vérifier également la variante
+                if ($sessionItem->variant_id) {
+                    $existingItemQuery->where('variant_id', $sessionItem->variant_id);
+                } else {
+                    $existingItemQuery->whereNull('variant_id');
+                }
+
+                $existingItem = $existingItemQuery->first();
 
                 if ($existingItem) {
                     // Additionner les quantités

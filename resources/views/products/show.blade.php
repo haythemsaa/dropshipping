@@ -50,12 +50,143 @@
         </div>
 
         <!-- Product Info -->
-        <div>
+        <div x-data="{
+            @if($product->hasVariants())
+                selectedVariant: null,
+                selectedAttributes: {},
+                variants: {{ $product->variants()->where('is_active', true)->with('product')->get()->toJson() }},
+                productAttributes: {{ \App\Models\ProductAttribute::active()->with('activeValues')->ordered()->get()->map(function($attr) use ($product) {
+                    $valueIds = $product->variants()->where('is_active', true)->pluck('attribute_value_ids')->flatten()->unique()->toArray();
+                    $attr->setRelation('values', $attr->activeValues()->whereIn('id', $valueIds)->get());
+                    return $attr;
+                })->filter(function($attr) { return $attr->values->count() > 0; })->toJson() }},
+                productPrice: {{ $product->price }},
+                productStock: {{ $product->stock_quantity }},
+                productSku: '{{ $product->sku }}',
+                mainImageUrl: '{{ $product->images->first() ? Storage::url($product->images->first()->image_path) : '' }}',
+                currentPrice: {{ $product->getDefaultVariant() ? $product->getDefaultVariant()->price : $product->price }},
+                currentStock: {{ $product->getDefaultVariant() ? $product->getDefaultVariant()->stock_quantity : $product->stock_quantity }},
+                currentSku: '{{ $product->getDefaultVariant() ? $product->getDefaultVariant()->sku : $product->sku }}',
+                currentImageUrl: '{{ $product->getDefaultVariant() && $product->getDefaultVariant()->image_path ? Storage::url($product->getDefaultVariant()->image_path) : ($product->images->first() ? Storage::url($product->images->first()->image_path) : '') }}',
+
+                init() {
+                    const defaultVariant = this.variants.find(v => v.is_default);
+                    if (defaultVariant) {
+                        this.selectedVariant = defaultVariant;
+                        Object.entries(defaultVariant.attributes).forEach(([key, value]) => {
+                            this.selectedAttributes[key] = value;
+                        });
+                        this.updateVariant();
+                    }
+                },
+
+                selectAttributeValue(attributeSlug, value) {
+                    this.selectedAttributes[attributeSlug] = value;
+                    this.updateVariant();
+                },
+
+                updateVariant() {
+                    const matchingVariant = this.variants.find(variant => {
+                        return Object.keys(this.selectedAttributes).every(key => {
+                            return variant.attributes[key] === this.selectedAttributes[key];
+                        });
+                    });
+
+                    if (matchingVariant) {
+                        this.selectedVariant = matchingVariant;
+                        this.currentPrice = matchingVariant.price;
+                        this.currentStock = matchingVariant.stock_quantity;
+                        this.currentSku = matchingVariant.sku;
+
+                        if (matchingVariant.image_path) {
+                            this.currentImageUrl = '/storage/' + matchingVariant.image_path;
+                            document.getElementById('main-image').src = this.currentImageUrl;
+                        } else {
+                            this.currentImageUrl = this.mainImageUrl;
+                            document.getElementById('main-image').src = this.mainImageUrl;
+                        }
+                    } else {
+                        this.selectedVariant = null;
+                        this.currentPrice = this.productPrice;
+                        this.currentStock = this.productStock;
+                        this.currentSku = this.productSku;
+                        this.currentImageUrl = this.mainImageUrl;
+                        document.getElementById('main-image').src = this.mainImageUrl;
+                    }
+                }
+            @else
+                currentPrice: {{ $product->price }},
+                currentStock: {{ $product->stock_quantity }},
+                currentSku: '{{ $product->sku }}'
+            @endif
+        }">
             <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $product->name }}</h1>
 
             <div class="flex items-center mb-6">
-                <span class="text-4xl font-bold text-indigo-600">{{ number_format($product->price, 2) }} TND</span>
+                <span class="text-4xl font-bold text-indigo-600" x-text="currentPrice.toFixed(2) + ' TND'">
+                    {{ number_format($product->getActivePrice(), 2) }} TND
+                </span>
             </div>
+
+            @if($product->hasVariants())
+                <!-- Variant Selector -->
+                <div class="mb-6 space-y-4">
+                    <template x-for="attribute in productAttributes" :key="attribute.id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2" x-text="attribute.name"></label>
+
+                            <!-- Color Swatches -->
+                            <template x-if="attribute.display_type === 'color'">
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="value in attribute.values" :key="value.id">
+                                        <button type="button"
+                                                @click="selectAttributeValue(attribute.slug, value.value)"
+                                                :class="{
+                                                    'ring-2 ring-indigo-600 ring-offset-2': selectedAttributes[attribute.slug] === value.value,
+                                                    'hover:scale-110': true
+                                                }"
+                                                class="w-10 h-10 rounded-full border-2 border-gray-300 transition-all"
+                                                :style="'background-color: ' + value.color_code"
+                                                :title="value.value">
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- Button Selection -->
+                            <template x-if="attribute.display_type === 'button'">
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="value in attribute.values" :key="value.id">
+                                        <button type="button"
+                                                @click="selectAttributeValue(attribute.slug, value.value)"
+                                                :class="{
+                                                    'border-indigo-600 bg-indigo-50 text-indigo-700': selectedAttributes[attribute.slug] === value.value,
+                                                    'border-gray-300 hover:border-gray-400': selectedAttributes[attribute.slug] !== value.value
+                                                }"
+                                                class="px-4 py-2 border-2 rounded-md transition-all"
+                                                x-text="value.value">
+                                        </button>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <!-- Select Dropdown -->
+                            <template x-if="attribute.display_type === 'select'">
+                                <select @change="selectAttributeValue(attribute.slug, $event.target.value)"
+                                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                    <option value="">-- Sélectionner --</option>
+                                    <template x-for="value in attribute.values" :key="value.id">
+                                        <option :value="value.value"
+                                                :selected="selectedAttributes[attribute.slug] === value.value"
+                                                x-text="value.value">
+                                        </option>
+                                    </template>
+                                </select>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            @endif
 
             <div class="border-t border-b border-gray-200 py-4 mb-6">
                 <div class="flex items-center justify-between mb-2">
@@ -71,27 +202,33 @@
                 </div>
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-gray-600">SKU:</span>
-                    <span class="font-mono text-sm">{{ $product->sku }}</span>
+                    <span class="font-mono text-sm" x-text="currentSku">{{ $product->sku }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-gray-600">Disponibilité:</span>
-                    @if($product->isInStock())
-                        <span class="text-green-600 font-semibold">En stock ({{ $product->stock_quantity }} unités)</span>
-                    @else
-                        <span class="text-red-600 font-semibold">Rupture de stock</span>
-                    @endif
+                    <span :class="currentStock > 0 ? 'text-green-600' : 'text-red-600'" class="font-semibold">
+                        <span x-show="currentStock > 0" x-text="'En stock (' + currentStock + ' unités)'">
+                            En stock ({{ $product->getTotalStock() }} unités)
+                        </span>
+                        <span x-show="currentStock <= 0">
+                            Rupture de stock
+                        </span>
+                    </span>
                 </div>
             </div>
 
             <!-- Add to Cart Form -->
-            @if($product->isInStock())
+            <div x-show="currentStock > 0">
                 <form action="{{ route('cart.add') }}" method="POST" class="mb-6">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    @if($product->hasVariants())
+                        <input type="hidden" name="variant_id" :value="selectedVariant ? selectedVariant.id : ''">
+                    @endif
 
                     <div class="flex items-center space-x-4 mb-4">
                         <label for="quantity" class="text-gray-700 font-medium">Quantité:</label>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ $product->stock_quantity }}"
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" :max="currentStock"
                                class="w-24 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
 
@@ -155,11 +292,11 @@
                         </div>
                     @endauth
                 </form>
-            @else
-                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                    <p class="text-red-700">Ce produit est actuellement en rupture de stock</p>
-                </div>
-            @endif
+            </div>
+
+            <div x-show="currentStock <= 0" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                <p class="text-red-700">Ce produit est actuellement en rupture de stock</p>
+            </div>
 
             <!-- Product Details -->
             <div class="border-t border-gray-200 pt-6">

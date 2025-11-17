@@ -16,9 +16,17 @@
                             <div class="flex items-center space-x-4">
                                 <!-- Product Image -->
                                 <div class="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                                    @if($item->product->images->first())
-                                        <img src="{{ Storage::url($item->product->images->first()->image_path) }}"
-                                             alt="{{ $item->product->name }}"
+                                    @php
+                                        $imageUrl = null;
+                                        if ($item->variant_id && $item->variant && $item->variant->image_path) {
+                                            $imageUrl = Storage::url($item->variant->image_path);
+                                        } elseif ($item->product->images->first()) {
+                                            $imageUrl = Storage::url($item->product->images->first()->image_path);
+                                        }
+                                    @endphp
+                                    @if($imageUrl)
+                                        <img src="{{ $imageUrl }}"
+                                             alt="{{ $item->getDisplayName() }}"
                                              class="w-full h-full object-cover">
                                     @endif
                                 </div>
@@ -27,14 +35,22 @@
                                 <div class="flex-1">
                                     <a href="{{ route('products.show', $item->product->slug) }}"
                                        class="font-semibold text-gray-900 hover:text-indigo-600">
-                                        {{ $item->product->name }}
+                                        {{ $item->getDisplayName() }}
                                     </a>
+                                    @if($item->variant_id && $item->variant)
+                                        <p class="text-xs text-gray-500 mt-1">SKU: {{ $item->variant->sku }}</p>
+                                    @endif
                                     <p class="text-sm text-gray-500 mt-1">{{ $item->product->supplier->business_name }}</p>
                                     <p class="text-sm text-gray-600 mt-1">Prix unitaire: {{ number_format($item->price, 2) }} TND</p>
 
-                                    @if($item->product->stock_quantity < $item->quantity)
+                                    @php
+                                        $availableStock = $item->variant_id && $item->variant
+                                            ? $item->variant->stock_quantity
+                                            : $item->product->stock_quantity;
+                                    @endphp
+                                    @if($availableStock < $item->quantity)
                                         <p class="text-sm text-red-600 mt-1">
-                                            Stock insuffisant (disponible: {{ $item->product->stock_quantity }})
+                                            Stock insuffisant (disponible: {{ $availableStock }})
                                         </p>
                                     @endif
                                 </div>
@@ -44,8 +60,13 @@
                                     <form action="{{ route('cart.update', $item) }}" method="POST" class="flex items-center space-x-2">
                                         @csrf
                                         @method('PATCH')
+                                        @php
+                                            $maxStock = $item->variant_id && $item->variant
+                                                ? $item->variant->stock_quantity
+                                                : $item->product->stock_quantity;
+                                        @endphp
                                         <input type="number" name="quantity" value="{{ $item->quantity }}" min="1"
-                                               max="{{ $item->product->stock_quantity }}"
+                                               max="{{ $maxStock }}"
                                                class="w-20 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                                onchange="this.form.submit()">
                                     </form>
