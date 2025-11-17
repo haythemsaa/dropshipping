@@ -152,7 +152,8 @@
 25. **757871b** - Système complet d'import CSV/Excel de produits (Laravel Excel, validation, template)
 26. **10aa745** - Système complet d'export Excel (commandes, produits, commissions avec filtres)
 27. **74449e0** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
-28. **En attente** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
+28. **593a7d0** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
+29. **En attente** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
 
 ## 🚧 À Compléter
 
@@ -266,8 +267,11 @@
 - [x] Actions en masse pour modération (approuver/supprimer)
 - [x] Filtres admin (statut, note)
 - [x] Pagination des avis
-- [ ] Notification fournisseur nouvel avis
-- [ ] Notification client avis approuvé
+- [x] Notification fournisseur nouvel avis (NewProductReview)
+- [x] Notification client avis approuvé (ReviewApproved)
+- [x] Intégration notifications dans ReviewController
+- [x] Intégration notifications dans Admin\ReviewController
+- [x] Notifications en masse (bulk approve)
 
 ### Tests (Priorité Moyenne)
 

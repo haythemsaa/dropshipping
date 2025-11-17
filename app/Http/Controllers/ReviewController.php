@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductReview;
 use App\Models\OrderItem;
+use App\Notifications\NewProductReview;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -73,7 +74,7 @@ class ReviewController extends Controller
                 })
                 ->firstOrFail();
 
-            ProductReview::create([
+            $review = ProductReview::create([
                 'product_id' => $product->id,
                 'user_id' => $user->id,
                 'order_item_id' => $orderItem->id,
@@ -84,7 +85,8 @@ class ReviewController extends Controller
                 'is_approved' => false, // Nécessite modération
             ]);
 
-            // TODO: Notifier le fournisseur et l'admin
+            // Notifier le fournisseur du nouveau avis
+            $product->supplier->notify(new NewProductReview($review));
 
             DB::commit();
 

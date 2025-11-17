@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductReview;
+use App\Notifications\ReviewApproved;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -54,7 +55,8 @@ class ReviewController extends Controller
         try {
             $review->approve();
 
-            // TODO: Notifier l'auteur de l'avis que son avis a été approuvé
+            // Notifier l'auteur de l'avis que son avis a été approuvé
+            $review->user->notify(new ReviewApproved($review));
 
             DB::commit();
 
@@ -115,11 +117,17 @@ class ReviewController extends Controller
 
         DB::beginTransaction();
         try {
-            ProductReview::whereIn('id', $validated['review_ids'])
-                ->update([
+            $reviews = ProductReview::with('user')->whereIn('id', $validated['review_ids'])->get();
+
+            foreach ($reviews as $review) {
+                $review->update([
                     'is_approved' => true,
                     'approved_at' => now(),
                 ]);
+
+                // Notifier l'auteur de chaque avis
+                $review->user->notify(new ReviewApproved($review));
+            }
 
             DB::commit();
 
