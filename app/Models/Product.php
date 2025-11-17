@@ -77,6 +77,11 @@ class Product extends Model
         return $this->hasMany(ProductReview::class)->where('is_approved', true);
     }
 
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     /**
      * Calculer la note moyenne du produit
      */

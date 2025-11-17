@@ -249,6 +249,42 @@
                                             </svg>
                                         </div>
                                     @endif
+
+                                    <!-- Wishlist Button -->
+                                    @auth
+                                        <div x-data="{
+                                            inWishlist: {{ auth()->user()->hasInWishlist($product->id) ? 'true' : 'false' }},
+                                            toggleWishlist() {
+                                                fetch('{{ route('wishlist.toggle', $product) }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Content-Type': 'application/json',
+                                                        'Accept': 'application/json'
+                                                    }
+                                                })
+                                                .then(r => r.json())
+                                                .then(data => {
+                                                    this.inWishlist = data.action === 'added';
+                                                    // Update header counter
+                                                    if (document.getElementById('wishlistCount')) {
+                                                        document.getElementById('wishlistCount').textContent = data.wishlistCount;
+                                                    }
+                                                });
+                                            }
+                                        }" class="absolute top-2 left-2">
+                                            <button @click="toggleWishlist()"
+                                                    type="button"
+                                                    class="bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition">
+                                                <svg class="h-5 w-5 transition"
+                                                     :class="inWishlist ? 'text-red-500 fill-current' : 'text-gray-400'"
+                                                     viewBox="0 0 24 24">
+                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    @endauth
+
                                     @if($product->is_featured)
                                         <span class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
                                             Vedette

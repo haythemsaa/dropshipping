@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\CommissionController as AdminCommissionController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\PaymentWebhookController;
 
 /*
@@ -60,6 +61,11 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::post('/profil/adresses', [ProfileController::class, 'storeAddress'])->name('profile.addresses.store');
     Route::patch('/profil/adresses/{address}', [ProfileController::class, 'updateAddress'])->name('profile.addresses.update');
     Route::delete('/profil/adresses/{address}', [ProfileController::class, 'destroyAddress'])->name('profile.addresses.destroy');
+
+    // Liste de souhaits (Wishlist)
+    Route::get('/favoris', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/favoris/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+    Route::delete('/favoris/{wishlist}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
 
     // Commandes (accessible à tous les utilisateurs authentifiés)
     Route::get('/commandes', [OrderController::class, 'index'])->name('orders.index');

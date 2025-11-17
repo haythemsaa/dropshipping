@@ -155,6 +155,8 @@
 28. **593a7d0** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
 29. **40ade41** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
 30. **701ba7f** - Système de recherche avancée et filtres (multi-catégories, prix, notes, autocomplete, 6 options de tri)
+31. **ff24723** - Mise à jour DEVELOPMENT.md - Système de recherche complété
+32. **En attente** - Système complet de liste de souhaits/favoris (wishlist avec toggle AJAX, compteur temps réel)
 
 ## 🚧 À Compléter
 
@@ -292,6 +294,25 @@
 - [x] Affichage des notes sur cartes produits
 - [x] ProductController mis à jour avec logique de filtrage
 - [x] Vue products/index.blade.php réécrite complètement
+
+#### Liste de Souhaits (Wishlist)
+- [x] Migration wishlists (user_id, product_id, unique constraint)
+- [x] Modèle Wishlist avec relations
+- [x] Relations wishlists dans User model
+- [x] Relations wishlists dans Product model
+- [x] Méthode helper hasInWishlist() dans User model
+- [x] WishlistController (index, toggle, destroy)
+- [x] Routes wishlist (/favoris)
+- [x] Vue wishlists/index.blade.php
+- [x] Boutons cœur sur cartes produits (Alpine.js, AJAX)
+- [x] Bouton wishlist sur page produit détail
+- [x] Compteur wishlist dans header avec badge
+- [x] Lien "Mes favoris" dans menu utilisateur
+- [x] Toggle AJAX avec mise à jour compteur temps réel
+- [x] État visuel (cœur rouge rempli si dans favoris)
+- [x] Suppression depuis page favoris
+- [x] Pagination des favoris (24 par page)
+- [x] État vide avec CTA vers catalogue
 
 ### Tests (Priorité Moyenne)
 

@@ -102,6 +102,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Cart::class);
     }
 
+    public function wishlists(): HasMany
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
     // Relationship for approvals
     public function approvedSuppliers(): HasMany
     {
@@ -140,5 +145,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->commissions()
             ->where('payment_status', 'unpaid')
             ->sum('supplier_amount');
+    }
+
+    public function hasInWishlist(int $productId): bool
+    {
+        return $this->wishlists()->where('product_id', $productId)->exists();
     }
 }
