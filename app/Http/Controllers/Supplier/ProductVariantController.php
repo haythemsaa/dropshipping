@@ -344,4 +344,17 @@ class ProductVariantController extends Controller
 
         return back()->with('success', 'Statut mis à jour avec succès.');
     }
+
+    /**
+     * Export variants to Excel.
+     */
+    public function export(Request $request)
+    {
+        $filters = $request->only(['status', 'low_stock', 'product_id']);
+
+        return \Excel::download(
+            new \App\Exports\SupplierProductVariantsExport(auth()->id(), $filters),
+            'variantes-produits-' . date('Y-m-d') . '.xlsx'
+        );
+    }
 }

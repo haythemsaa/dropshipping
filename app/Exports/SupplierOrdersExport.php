@@ -29,7 +29,7 @@ class SupplierOrdersExport implements FromQuery, WithHeadings, WithMapping, With
     public function query()
     {
         $query = OrderItem::query()
-            ->with(['order.user', 'product', 'shipment'])
+            ->with(['order.user', 'product', 'variant', 'shipment'])
             ->where('supplier_id', $this->supplierId);
 
         // Filtrer par statut
@@ -64,6 +64,7 @@ class SupplierOrdersExport implements FromQuery, WithHeadings, WithMapping, With
             'Client',
             'Email Client',
             'Produit',
+            'Variante',
             'SKU',
             'Quantité',
             'Prix Unitaire',
@@ -89,7 +90,8 @@ class SupplierOrdersExport implements FromQuery, WithHeadings, WithMapping, With
             $orderItem->order->user->name,
             $orderItem->order->user->email,
             $orderItem->product_name,
-            $orderItem->product_sku,
+            $orderItem->getFormattedVariantAttributes(true) ?: '-',
+            $orderItem->getSku(),
             $orderItem->quantity,
             number_format($orderItem->price, 2),
             number_format($orderItem->subtotal, 2),

@@ -135,6 +135,7 @@ Route::middleware(['auth', 'verified', 'active', 'supplier'])->prefix('fournisse
     Route::delete('/produits/{product}/variantes/{variant}', [SupplierProductVariantController::class, 'destroy'])->name('products.variants.destroy');
     Route::post('/produits/{product}/variantes/generate-bulk', [SupplierProductVariantController::class, 'generateBulk'])->name('products.variants.generate-bulk');
     Route::post('/produits/{product}/variantes/{variant}/toggle-status', [SupplierProductVariantController::class, 'toggleStatus'])->name('products.variants.toggle-status');
+    Route::get('/variantes/export', [SupplierProductVariantController::class, 'export'])->name('variants.export');
 
     // Gestion des commandes
     Route::get('/commandes', [SupplierOrderController::class, 'index'])->name('orders.index');

@@ -42,6 +42,14 @@ class ProductVariant extends Model
     }
 
     /**
+     * Get the order items for this variant.
+     */
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'variant_id');
+    }
+
+    /**
      * Scope a query to only include active variants.
      */
     public function scopeActive($query)
@@ -199,5 +207,91 @@ class ProductVariant extends Model
         return ProductAttributeValue::whereIn('id', $this->attribute_value_ids)
             ->with('attribute')
             ->get();
+    }
+
+    /**
+     * Get total sales quantity.
+     */
+    public function getTotalSales(): int
+    {
+        return $this->orderItems()
+            ->whereHas('order', function($q) {
+                $q->whereNotIn('status', ['cancelled']);
+            })
+            ->sum('quantity');
+    }
+
+    /**
+     * Get total revenue.
+     */
+    public function getTotalRevenue(): float
+    {
+        return (float) $this->orderItems()
+            ->whereHas('order', function($q) {
+                $q->whereNotIn('status', ['cancelled']);
+            })
+            ->sum('subtotal');
+    }
+
+    /**
+     * Get sales for a specific period (in days).
+     */
+    public function getSalesForPeriod(int $days): int
+    {
+        return $this->orderItems()
+            ->whereHas('order', function($q) use ($days) {
+                $q->where('created_at', '>=', now()->subDays($days))
+                  ->whereNotIn('status', ['cancelled']);
+            })
+            ->sum('quantity');
+    }
+
+    /**
+     * Get revenue for a specific period (in days).
+     */
+    public function getRevenueForPeriod(int $days): float
+    {
+        return (float) $this->orderItems()
+            ->whereHas('order', function($q) use ($days) {
+                $q->where('created_at', '>=', now()->subDays($days))
+                  ->whereNotIn('status', ['cancelled']);
+            })
+            ->sum('subtotal');
+    }
+
+    /**
+     * Check if stock is low (less than or equal to 10 units).
+     */
+    public function isLowStock(): bool
+    {
+        return $this->stock_quantity <= 10;
+    }
+
+    /**
+     * Get stock status label.
+     */
+    public function getStockStatusLabel(): string
+    {
+        if ($this->stock_quantity == 0) {
+            return 'Rupture';
+        } elseif ($this->isLowStock()) {
+            return 'Stock faible';
+        } else {
+            return 'En stock';
+        }
+    }
+
+    /**
+     * Get stock status color for display.
+     */
+    public function getStockStatusColor(): string
+    {
+        if ($this->stock_quantity == 0) {
+            return 'red';
+        } elseif ($this->isLowStock()) {
+            return 'orange';
+        } else {
+            return 'green';
+        }
     }
 }
