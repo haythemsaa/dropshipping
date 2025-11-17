@@ -154,6 +154,7 @@
 27. **74449e0** - Système complet d'avis et notes produits (backend, contrôleurs, modération)
 28. **593a7d0** - Vues complètes du système d'avis (création, édition, modération, affichage produit)
 29. **40ade41** - Notifications email pour système d'avis (NewProductReview, ReviewApproved)
+30. **701ba7f** - Système de recherche avancée et filtres (multi-catégories, prix, notes, autocomplete, 6 options de tri)
 
 ## 🚧 À Compléter
 
