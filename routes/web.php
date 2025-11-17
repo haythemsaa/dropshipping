@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\ProductAttributeController as AdminProductAttributeController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ComparisonController;
 use App\Http\Controllers\PaymentWebhookController;
 use App\Http\Controllers\Supplier\ProductVariantController as SupplierProductVariantController;
 
@@ -46,6 +47,13 @@ Route::post('/panier/ajouter', [CartController::class, 'add'])->name('cart.add')
 Route::patch('/panier/{cartItem}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/panier/{cartItem}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/panier', [CartController::class, 'clear'])->name('cart.clear');
+
+// Comparaison produits
+Route::get('/comparaison', [ComparisonController::class, 'index'])->name('comparison.index');
+Route::post('/comparaison/ajouter', [ComparisonController::class, 'add'])->name('comparison.add');
+Route::delete('/comparaison/{product}', [ComparisonController::class, 'remove'])->name('comparison.remove');
+Route::delete('/comparaison', [ComparisonController::class, 'clear'])->name('comparison.clear');
+Route::get('/comparaison/count', [ComparisonController::class, 'count'])->name('comparison.count');
 
 /*
 |--------------------------------------------------------------------------

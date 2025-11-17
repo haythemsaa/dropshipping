@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Services\RecentlyViewedService;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -111,7 +112,7 @@ class ProductController extends Controller
     /**
      * Affiche les détails d'un produit
      */
-    public function show(Product $product)
+    public function show(Product $product, RecentlyViewedService $recentlyViewedService)
     {
         // Vérifier que le produit est actif et approuvé
         if ($product->status !== 'active' || !$product->approved_at) {
@@ -120,6 +121,9 @@ class ProductController extends Controller
 
         // Charger les relations
         $product->load(['supplier', 'images', 'category']);
+
+        // Ajouter aux produits récemment consultés
+        $recentlyViewedService->addProduct($product->id);
 
         // Charger les avis approuvés
         $reviews = $product->approvedReviews()

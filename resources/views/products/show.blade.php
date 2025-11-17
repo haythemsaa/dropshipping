@@ -509,6 +509,11 @@
             </div>
         </div>
     @endif
+
+    <!-- Recently Viewed Products -->
+    <div class="mt-16">
+        <x-recently-viewed-products />
+    </div>
 </div>
 
 <script>

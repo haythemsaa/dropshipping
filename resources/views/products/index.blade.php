@@ -285,6 +285,36 @@
                                         </div>
                                     @endauth
 
+                                    <!-- Compare Button -->
+                                    <div x-data="{
+                                        addToCompare() {
+                                            fetch('{{ route('comparison.add') }}', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                    'Content-Type': 'application/json',
+                                                    'Accept': 'application/json'
+                                                },
+                                                body: JSON.stringify({ product_id: {{ $product->id }} })
+                                            })
+                                            .then(r => r.json())
+                                            .then(data => {
+                                                if (data.success) {
+                                                    alert(data.message);
+                                                } else {
+                                                    alert(data.message);
+                                                }
+                                            });
+                                        }
+                                    }" class="absolute bottom-2 right-2">
+                                        <button @click="addToCompare(); $event.preventDefault()"
+                                                type="button"
+                                                title="Ajouter à la comparaison"
+                                                class="bg-white rounded-full p-2 shadow-md hover:bg-purple-50 transition">
+                                            <i class="fas fa-balance-scale h-5 w-5 text-purple-600"></i>
+                                        </button>
+                                    </div>
+
                                     @if($product->is_featured)
                                         <span class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded">
                                             Vedette
