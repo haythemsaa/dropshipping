@@ -167,6 +167,7 @@
 40. **442adf2** - Vues supplier gestion variantes (index avec stats, create/edit, génération bulk)
 41. **469b31a** - Intégration frontend variantes (selector Alpine.js, cart support, images dynamiques)
 42. **55d7750** - Intégration complète variantes dans commandes (OrderItem snapshot, stock management, price ranges)
+43. **9582a2d** - Support variantes vues supplier/admin + notifications email + seeder données test
 
 ## 🚧 À Compléter
 
@@ -397,6 +398,10 @@
 - [x] Snapshot attributs variante au moment commande (historique immuable)
 - [x] Stock management intelligent (variante vs produit selon contexte)
 - [x] Support complet cycle de vie: sélection → panier → checkout → commande
+- [x] Vues supplier/admin orders mises à jour (affichage variantes, images, attributs)
+- [x] Notifications email enrichies (OrderConfirmation, NewOrderNotification avec détails variantes)
+- [x] ProductVariantSeeder complet (3 attributs, 5 couleurs, 4 tailles, génération auto variantes)
+- [x] Données de test réalistes (12 variantes mode, 4 variantes électronique)
 
 ### Tests (Priorité Moyenne)
 
