@@ -166,6 +166,7 @@
 39. **6dacb08** - Vues admin gestion attributs (index avec modals, values avec color picker)
 40. **442adf2** - Vues supplier gestion variantes (index avec stats, create/edit, génération bulk)
 41. **469b31a** - Intégration frontend variantes (selector Alpine.js, cart support, images dynamiques)
+42. **55d7750** - Intégration complète variantes dans commandes (OrderItem snapshot, stock management, price ranges)
 
 ## 🚧 À Compléter
 
@@ -388,6 +389,14 @@
 - [x] Positionnement et tri des attributs/valeurs
 - [x] Validation SKU unique par variante
 - [x] Gestion active/inactive variantes
+- [x] Migration add_variant_id_to_order_items (variant_id, variant_attributes snapshot, variant_sku)
+- [x] OrderItem model étendu (variant relation, getDisplayName, getFormattedVariantAttributes, getSku)
+- [x] OrderController intégration variantes (validation stock, création order_items, decrement stock variant)
+- [x] Vues commandes mises à jour (show, confirmation, index, checkout avec infos variantes)
+- [x] Affichage fourchette de prix sur liste produits (X - Y TND pour variantes)
+- [x] Snapshot attributs variante au moment commande (historique immuable)
+- [x] Stock management intelligent (variante vs produit selon contexte)
+- [x] Support complet cycle de vie: sélection → panier → checkout → commande
 
 ### Tests (Priorité Moyenne)
 
